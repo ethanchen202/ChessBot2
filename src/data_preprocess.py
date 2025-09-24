@@ -3,6 +3,10 @@ import chess.pgn
 import numpy as np
 from collections import deque
 import h5py
+import pickle
+import lmdb
+
+from run_timer import TIMER
 
 
 # Map piece type to plane index
@@ -232,31 +236,88 @@ def encode_pgn_file(pgn_path, history_length=8, num_games=1000, chunk_size=100):
             yield np.concatenate(all_games_tensors, axis=0), np.concatenate(all_policy_tensors, axis=0), np.concatenate(all_value_tensors, axis=0)
 
 
-def store_h5py(pgn_path, h5py_path, num_games=1000, history_length=1, chunk_size=500):
+def store_h5py(pgn_path, h5py_path, num_games=2173847, max_samples=1000, history_length=1, chunk_size=50):
     """
     Preprocesses the given pgn dataset and stores it in h5 format.
     """
     with h5py.File(h5py_path, "w") as f:
-        dset_x = f.create_dataset("features", shape=(0, 18, 8, 8), maxshape=(None, 18, 8, 8), dtype="float32", chunks=True)
-        dset_p = f.create_dataset("policies", shape=(0, 4672), maxshape=(None, 4672), dtype="float32", chunks=True)
-        dset_v = f.create_dataset("values", shape=(0,), maxshape=(None,), dtype="float32", chunks=True)
+
+        TIMER.start("Creating datasets")
+        dset_x = f.create_dataset("features", shape=(max_samples, 18, 8, 8), dtype="float32", chunks=None, compression=None)
+        dset_p = f.create_dataset("policies", shape=(max_samples, 4672), dtype="float32", chunks=None, compression=None)
+        dset_v = f.create_dataset("values", shape=(max_samples,), dtype="float32", chunks=None, compression=None)
+        TIMER.stop("Creating datasets")
         
+        current_size = 0
+        TIMER.start(f"Data sample {current_size}/{max_samples}")
         for tensor, policy, value in encode_pgn_file(pgn_path, history_length, num_games, chunk_size):
-            old_size = dset_x.shape[0]
+
+            TIMER.stop(f"Data sample {current_size}/{max_samples}")
+            old_size = current_size
             new_size = old_size + tensor.shape[0]
-            
-            dset_x.resize(new_size, axis=0)
-            dset_p.resize(new_size, axis=0)
-            dset_v.resize(new_size, axis=0)
+            TIMER.start(f"Data sample {new_size}/{max_samples}")
+
+            if new_size > max_samples:
+                new_size = max_samples
+                tensor = tensor[:(new_size - old_size)]
+                policy = policy[:(new_size - old_size)]
+                value = value[:(new_size - old_size)]
             
             dset_x[old_size:new_size] = tensor
             dset_p[old_size:new_size] = policy
             dset_v[old_size:new_size] = value
 
+            current_size = new_size
+            if current_size >= max_samples:
+                break
+
+        f.attrs["num_samples"] = current_size
+        f.attrs["history_length"] = history_length
+
+
+
+def store_lmdb(pgn_path, lmdb_path, num_games=2173847, max_samples=1000, history_length=1, chunk_size=50):
+    """
+    Preprocesses the PGN dataset and stores it in LMDB format.
+    Each sample is serialized with pickle and stored individually.
+    """
+    # Estimate map_size: very rough estimate (e.g., 1 GB per 100k samples)
+    map_size = max_samples * (18*8*8 + 4672 + 1) * 4 * 2  # float32, times 2 safety factor
+
+    env = lmdb.open(lmdb_path, map_size=map_size)
+
+    current_size = 0
+    TIMER.start(f"Data sample {current_size}/{max_samples}")
+    
+    with env.begin(write=True) as txn:
+        for tensor, policy, value in encode_pgn_file(pgn_path, history_length, num_games, chunk_size):
+            for i in range(tensor.shape[0]):
+                if current_size >= max_samples:
+                    break
+
+                # Serialize sample as a tuple
+                sample = (tensor[i], policy[i], value[i])
+                key = f"{current_size:08}".encode("ascii")
+                txn.put(key, pickle.dumps(sample, protocol=pickle.HIGHEST_PROTOCOL))
+
+                current_size += 1
+
+            if current_size >= max_samples:
+                break
+
+        # Store metadata as a special key
+        txn.put(b"__len__", pickle.dumps(current_size))
+        txn.put(b"__history_length__", pickle.dumps(history_length))
+
+    env.close()
+    print(f"Finished writing {current_size} samples to LMDB")
+
+
 
 if __name__ == "__main__":
     data_path = r'/teamspace/studios/this_studio/chess_bot/datasets/raw/CCRL-4040/CCRL-4040.[2173847].pgn'
     h5py_path = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040.h5'
+    lmdb_path = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040.lmdb'
 
     # tensor, policy, value = encode_pgn_file(file_path, history_length=1, num_games=1)
-    store_h5py(pgn_path=data_path, h5py_path=h5py_path, num_games=1000, history_length=1, chunk_size=100)
+    store_h5py(pgn_path=data_path, h5py_path=h5py_path, max_samples=10000000, history_length=1, chunk_size=5)
