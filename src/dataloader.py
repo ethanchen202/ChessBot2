@@ -3,12 +3,14 @@ import torch
 from torch.utils.data import Dataset, DataLoader, Sampler
 import h5py
 import numpy as np
+import lmdb
+import pickle
 import os
 
 from run_timer import TIMER
 
 
-class CCRL4040Dataset(Dataset):
+class CCRL4040H5Dataset(Dataset):
     def __init__(self, h5_path, batch_size=320, shuffle=True):
         super().__init__()
         self.h5_path: str = h5_path
@@ -79,16 +81,38 @@ def worker_init_fn(worker_id):
     dataset._values = None # type: ignore
 
 
+class CCRL4040LMDBDataset(Dataset):
+    def __init__(self, lmdb_path):
+        self.env = lmdb.open(lmdb_path, readonly=True, lock=False)
+        with self.env.begin() as txn:
+            self.length = pickle.loads(txn.get(b"__len__"))
+
+    def __len__(self):
+        return self.length
+
+    def __getitem__(self, idx):
+        with self.env.begin() as txn:
+            sample = pickle.loads(txn.get(f"{idx:08}".encode("ascii")))
+        x, policy, value = sample
+        return (
+            torch.as_tensor(x, dtype=torch.float32),
+            torch.as_tensor(policy, dtype=torch.float32),
+            torch.as_tensor(value, dtype=torch.float32)
+        )
+
+
 
 if __name__ == "__main__":
 
     TIMER.start("Initializing Dataloader")
     h5_path = "/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040.h5"
+    lmdb_path = "/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040.lmdb"
 
-    dataset = CCRL4040Dataset(h5_path)
+    dataset = CCRL4040LMDBDataset(lmdb_path)
 
     dataloader = DataLoader(
-        CCRL4040Dataset(h5_path, batch_size=320),
+        CCRL4040LMDBDataset(lmdb_path),
+        batch_size=320,
         num_workers=4,
         worker_init_fn=worker_init_fn,
         persistent_workers=True

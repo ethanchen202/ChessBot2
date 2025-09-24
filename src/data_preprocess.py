@@ -281,6 +281,7 @@ def store_lmdb(pgn_path, lmdb_path, num_games=2173847, max_samples=1000, history
     Preprocesses the PGN dataset and stores it in LMDB format.
     Each sample is serialized with pickle and stored individually.
     """
+    TIMER.start("Creating LMDB")
     # Estimate map_size: very rough estimate (e.g., 1 GB per 100k samples)
     map_size = max_samples * (18*8*8 + 4672 + 1) * 4 * 2  # float32, times 2 safety factor
 
@@ -291,6 +292,8 @@ def store_lmdb(pgn_path, lmdb_path, num_games=2173847, max_samples=1000, history
     
     with env.begin(write=True) as txn:
         for tensor, policy, value in encode_pgn_file(pgn_path, history_length, num_games, chunk_size):
+            TIMER.stop(f"Data sample {current_size}/{max_samples}")
+            TIMER.start(f"Data sample {current_size + tensor.shape[0]}/{max_samples}")
             for i in range(tensor.shape[0]):
                 if current_size >= max_samples:
                     break
@@ -320,4 +323,5 @@ if __name__ == "__main__":
     lmdb_path = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040.lmdb'
 
     # tensor, policy, value = encode_pgn_file(file_path, history_length=1, num_games=1)
-    store_h5py(pgn_path=data_path, h5py_path=h5py_path, max_samples=10000000, history_length=1, chunk_size=5)
+    # store_h5py(pgn_path=data_path, h5py_path=h5py_path, max_samples=10000000, history_length=1, chunk_size=5)
+    store_lmdb(pgn_path=data_path, lmdb_path=lmdb_path, max_samples=1000000, history_length=1, chunk_size=5)
