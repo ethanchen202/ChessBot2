@@ -283,7 +283,7 @@ def store_lmdb(pgn_path, lmdb_path, num_games=2173847, max_samples=1000, history
     """
     TIMER.start("Creating LMDB")
     # Estimate map_size: very rough estimate (e.g., 1 GB per 100k samples)
-    map_size = max_samples * (18*8*8 + 4672 + 1) * 4 * 2  # float32, times 2 safety factor
+    map_size = max_samples * (18*8*8 + 4672 + 1) * 4 * 10  # float32, times 2 safety factor
 
     env = lmdb.open(lmdb_path, map_size=map_size)
 
@@ -320,8 +320,6 @@ def store_lmdb(pgn_path, lmdb_path, num_games=2173847, max_samples=1000, history
 if __name__ == "__main__":
     data_path = r'/teamspace/studios/this_studio/chess_bot/datasets/raw/CCRL-4040/CCRL-4040.[2173847].pgn'
     h5py_path = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040.h5'
-    lmdb_path = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040.lmdb'
+    lmdb_path = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-train.lmdb'
 
-    # tensor, policy, value = encode_pgn_file(file_path, history_length=1, num_games=1)
-    # store_h5py(pgn_path=data_path, h5py_path=h5py_path, max_samples=10000000, history_length=1, chunk_size=5)
     store_lmdb(pgn_path=data_path, lmdb_path=lmdb_path, max_samples=1000000, history_length=1, chunk_size=5)

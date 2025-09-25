@@ -91,8 +91,14 @@ class CCRL4040LMDBDataset(Dataset):
         return self.length
 
     def __getitem__(self, idx):
+
         with self.env.begin() as txn:
-            sample = pickle.loads(txn.get(f"{idx:08}".encode("ascii")))
+            data = txn.get(f"{idx:08}".encode("ascii"))
+            try:
+                sample = pickle.loads(data)
+            except Exception as e:
+                raise RuntimeError(f"Corrupt LMDB entry at idx={idx}") from e
+            # sample = pickle.loads(txn.get(f"{idx:08}".encode("ascii")))
         x, policy, value = sample
         return (
             torch.as_tensor(x, dtype=torch.float32),
@@ -106,7 +112,7 @@ if __name__ == "__main__":
 
     TIMER.start("Initializing Dataloader")
     h5_path = "/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040.h5"
-    lmdb_path = "/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040.lmdb"
+    lmdb_path = "/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-train-small.lmdb"
 
     dataset = CCRL4040LMDBDataset(lmdb_path)
 
@@ -120,7 +126,6 @@ if __name__ == "__main__":
     TIMER.stop("Initializing Dataloader")
 
     TIMER.start("Loading data batch")
-    for x, policy, value in dataloader:
-        TIMER.stop("Loading data batch")
+    for i, (x, policy, value) in enumerate(dataloader):
+        TIMER.lap("Loading data batch", i + 1, len(dataloader))
         print(x.shape, policy.shape, value.shape)
-        TIMER.start("Loading data batch")
