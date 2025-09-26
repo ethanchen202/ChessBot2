@@ -8,6 +8,7 @@ import lmdb
 
 from run_timer import TIMER
 
+games_processed = 0
 
 # Map piece type to plane index
 piece_to_index = {
@@ -217,13 +218,17 @@ def encode_pgn_file(pgn_path, history_length=8, num_games=1000, chunk_size=100):
     
     Returns a list of games, where each game is a list of tensors.
     """
-    all_games_tensors = []
-    all_policy_tensors = []
-    all_value_tensors = []
+    global games_processed
 
     with open(pgn_path, "r") as pgn_file:
         game = chess.pgn.read_game(pgn_file)
+        skip = games_processed
+        for _ in range(skip):
+            game = chess.pgn.read_game(pgn_file)
         for chunk in range(num_games // chunk_size):
+            all_games_tensors = []
+            all_policy_tensors = []
+            all_value_tensors = []
             for _ in range(chunk_size):
                 if game is None:
                     break
@@ -233,6 +238,7 @@ def encode_pgn_file(pgn_path, history_length=8, num_games=1000, chunk_size=100):
                 all_value_tensors.append(value_tensors)
                 game = chess.pgn.read_game(pgn_file)
 
+            games_processed += 1
             yield np.concatenate(all_games_tensors, axis=0), np.concatenate(all_policy_tensors, axis=0), np.concatenate(all_value_tensors, axis=0)
 
 
@@ -320,6 +326,8 @@ def store_lmdb(pgn_path, lmdb_path, num_games=2173847, max_samples=1000, history
 if __name__ == "__main__":
     data_path = r'/teamspace/studios/this_studio/chess_bot/datasets/raw/CCRL-4040/CCRL-4040.[2173847].pgn'
     h5py_path = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040.h5'
-    lmdb_path = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-train.lmdb'
+    lmdb_path_train = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-train.lmdb'
+    lmdb_path_val = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-val.lmdb'
 
-    store_lmdb(pgn_path=data_path, lmdb_path=lmdb_path, max_samples=1000000, history_length=1, chunk_size=5)
+    store_lmdb(pgn_path=data_path, lmdb_path=lmdb_path_train, max_samples=1000000, history_length=1, chunk_size=5)
+    store_lmdb(pgn_path=data_path, lmdb_path=lmdb_path_val, max_samples=100000, history_length=1, chunk_size=5)

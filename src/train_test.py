@@ -7,7 +7,7 @@ from torch.amp.autocast_mode import autocast
 import os
 
 from run_timer import TIMER
-from dataloader import CCRL4040LMDBDataset
+from dataloader import CCRL4040LMDBDataset, worker_init_fn
 from model import ChessViT
 
 
@@ -50,7 +50,7 @@ def train_pipeline(
         
         optimizer.zero_grad()
         
-        TIMER.start(f"Training step 0/{len(train_loader)}")
+        TIMER.start(f"Training for {len(train_loader)} batches")
         for step, (x, policy_labels, value_labels) in enumerate(train_loader):
 
             x = x.to(device)
@@ -75,6 +75,9 @@ def train_pipeline(
             
             total_policy_loss += loss_policy.item()
             total_value_loss += loss_value.item()
+
+            if step % 100 == 0:
+                TIMER.lap(f"Training for {len(train_loader)} batches", step + 1, len(train_loader))
         
         avg_policy_loss = total_policy_loss / len(train_loader)
         avg_value_loss = total_value_loss / len(train_loader)
@@ -91,6 +94,11 @@ def train_pipeline(
             model.eval()
             val_policy_loss = 0.0
             val_value_loss = 0.0
+
+            correct_top1 = 0
+            correct_top5 = 0
+            total = 0
+
             with torch.no_grad():
                 for x, policy_labels, value_labels in val_loader:
                     x = x.to(device)
@@ -98,12 +106,31 @@ def train_pipeline(
                     value_labels = value_labels.to(device)
                     
                     with autocast(device):
+                        # compute loss
                         policy_logits, value_preds = model(x)
                         val_policy_loss += policy_loss_fn(policy_logits, policy_labels).item()
                         val_value_loss += value_loss_fn(value_preds, value_labels).item()
+
+                        # accuracy
+                        _, pred_top1 = policy_logits.max(dim=1)  # Top-1
+                        correct_top1 += pred_top1.eq(policy_labels.argmax(dim=1)).sum().item()
+                        
+                        # Top-5
+                        top5_preds = policy_logits.topk(5, dim=1).indices  # (batch_size, 5)
+                        correct_top5 += top5_preds.eq(policy_labels.argmax(dim=1).view(-1, 1)).sum().item()
+                        
+                        total += policy_labels.size(0)
+
             val_policy_loss /= len(val_loader)
             val_value_loss /= len(val_loader)
-            print(f"Validation: Policy Loss={val_policy_loss:.4f}, Value Loss={val_value_loss:.4f}")
+            top1_acc = correct_top1 / total
+            top5_acc = correct_top5 / total
+
+            print(f"Validation: "
+                f"Policy Loss={val_policy_loss:.4f}, "
+                f"Value Loss={val_value_loss:.4f}, "
+                f"Top-1 Acc={top1_acc:.4f}, "
+                f"Top-5 Acc={top5_acc:.4f}")
         
         TIMER.stop(f"Validating epoch {epoch}")
 
@@ -119,20 +146,21 @@ if __name__ == "__main__":
 
     TIMER.start("Initializing Dataloader")
     # Paths
-    lmdb_path = "/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040.lmdb"
-    checkpoint_path = "/teamspace/studios/this_studio/chess_bot/checkpoints"
+    lmdb_path_train = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-train.lmdb'
+    lmdb_path_val = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-val.lmdb'
+    checkpoint_path = r'/teamspace/studios/this_studio/chess_bot/results/checkpoints'
 
     # Hyperparameters
-    batch_size = 64
+    batch_size = 320
     accumulation_steps = 2  # effective batch size = batch_size * accumulation_steps
-    num_epochs = 5
+    num_epochs = 200
     
     # Create datasets
-    train_dataset = CCRL4040LMDBDataset(lmdb_path)
-    val_dataset = CCRL4040LMDBDataset(lmdb_path)
+    train_dataset = CCRL4040LMDBDataset(lmdb_path_train)
+    val_dataset = CCRL4040LMDBDataset(lmdb_path_val)
     
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=2)
-    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=2)
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=4, worker_init_fn=worker_init_fn, persistent_workers=True)
+    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=4, worker_init_fn=worker_init_fn, persistent_workers=True)
     
     TIMER.stop("Initializing Dataloader")
 
