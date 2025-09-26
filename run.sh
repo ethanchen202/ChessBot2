@@ -1,0 +1,1 @@
+/home/zeus/miniconda3/envs/cloudspace/bin/python /teamspace/studios/this_studio/chess_bot/src/train_test.py >/teamspace/studios/this_studio/chess_bot/results/last_run_logs.txt 2>&1
