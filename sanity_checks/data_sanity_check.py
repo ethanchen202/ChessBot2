@@ -2,14 +2,13 @@ import sys
 
 sys.path.append("/teamspace/studios/this_studio/chess_bot/src")
 
+from data_preprocess import move_to_index, index_to_move    # type: ignore
 from dataloader import CCRL4040LMDBDataset, worker_init_fn  # type: ignore
 from run_timer import TIMER                                 # type: ignore
 from torch.utils.data import DataLoader
 import numpy as np
 import chess
-
-import numpy as np
-import chess
+import chess.pgn
 
 
 piece_to_index = {
@@ -52,14 +51,10 @@ def print_board(tensor):
     print(board_str)
 
 
-
-if __name__ == "__main__":
-    dataset = CCRL4040LMDBDataset("/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040.lmdb")
-
+def sanity_check_input(h5_path, lmdb_path):
+    dataset = CCRL4040LMDBDataset(lmdb_path)
 
     TIMER.start("Initializing Dataloader")
-    h5_path = "/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040.h5"
-    lmdb_path = "/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040.lmdb"
 
     dataset = CCRL4040LMDBDataset(lmdb_path)
 
@@ -81,3 +76,26 @@ if __name__ == "__main__":
         # TIMER.start("Loading data batch")
     
     print(dataset[0])
+
+
+def sanity_check_policy(pgn_path, num_games=100):
+    with open(pgn_path, "r") as pgn_file:
+        for _ in range(num_games):
+            breakpoint()
+            game = chess.pgn.read_game(pgn_file)
+            board = game.board() # type: ignore
+            for move in game.mainline_moves(): # type: ignore
+                print(move, end="|")
+                print(move_to_index(move, board), end="|")
+                print(index_to_move(move_to_index(move, board), board))         
+                board.push(move)
+            
+
+
+
+if __name__ == "__main__":
+    h5_path = "/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040.h5"
+    lmdb_path = "/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040.lmdb"
+    pgn_path = r"/teamspace/studios/this_studio/chess_bot/datasets/raw/CCRL-4040/CCRL-4040.[2173847].pgn"
+    # sanity_check_input(h5_path, lmdb_path)
+    sanity_check_policy(pgn_path)

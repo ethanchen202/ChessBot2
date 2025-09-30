@@ -147,11 +147,74 @@ def move_to_index(move, board):
     return index
 
 
+def index_to_move(index, board):
+    """
+    Inverse of move_to_index:
+    Convert policy index (0..4671) back into a chess.Move.
+    """
+    from_sq = index // NUM_MOVE_TYPES
+    move_type = index % NUM_MOVE_TYPES
+    from_row, from_col = divmod(from_sq, 8)
+
+    # Sliding pieces (0–55: 8 directions × 7 steps)
+    if move_type < 56:
+        direction = move_type // 7
+        steps = (move_type % 7) + 1  # steps = 1..7
+        # Directions N,S,E,W,NE,NW,SE,SW
+        dir_map = {
+            0: (1, 0),   # N
+            1: (-1, 0),  # S
+            2: (0, 1),   # E
+            3: (0, -1),  # W
+            4: (1, 1),   # NE
+            5: (1, -1),  # NW
+            6: (-1, 1),  # SE
+            7: (-1, -1)  # SW
+        }
+        dr, dc = dir_map[direction]
+        to_row = from_row + dr * steps
+        to_col = from_col + dc * steps
+        to_sq = to_row * 8 + to_col
+        return chess.Move(from_sq, to_sq)
+
+    # Knight moves (56–63)
+    elif move_type < 64:
+        i = move_type - 56
+        dr, dc = KNIGHT_OFFSETS[i]
+        to_row = from_row + dr
+        to_col = from_col + dc
+        to_sq = to_row * 8 + to_col
+        return chess.Move(from_sq, to_sq)
+
+    # Promotions (64+)
+    elif move_type >= 64:
+        i = move_type - 64
+        prom_piece = PROMOTION_OFFSETS[i][1]  # your PROMOTION_OFFSETS maps offsets→piece
+        # Simple assumption: pawn always moves “forward one” for promotions
+        piece = board.piece_at(from_sq)
+        if piece is None:
+            raise ValueError("Promotion move from empty square")
+        dr = 1 if piece.color == chess.WHITE else -1
+        to_row = from_row + dr
+        to_col = from_col
+        to_sq = to_row * 8 + to_col
+        return chess.Move(from_sq, to_sq, promotion=prom_piece)
+
+    else:
+        raise ValueError(f"Unknown move_type: {move_type}")
+
+
 def move_to_policy_vector(move, board):
     index = move_to_index(move, board)
     vec = np.zeros(POLICY_VECTOR_SIZE, dtype=np.float32)
     vec[index] = 1.0
     return vec
+
+
+def policy_vector_to_move(tensor, board):
+    index = np.argmax(tensor)
+    move = index_to_move(index, board)
+    return move
 
 
 def encode_game(game, history_length=8):
@@ -223,8 +286,10 @@ def encode_pgn_file(pgn_path, history_length=8, num_games=1000, chunk_size=100):
     with open(pgn_path, "r") as pgn_file:
         game = chess.pgn.read_game(pgn_file)
         skip = games_processed
+        TIMER.start("Skipping already encoded games")
         for _ in range(skip):
             game = chess.pgn.read_game(pgn_file)
+        TIMER.stop("Skipping already encoded games")
         for chunk in range(num_games // chunk_size):
             all_games_tensors = []
             all_policy_tensors = []
@@ -294,12 +359,11 @@ def store_lmdb(pgn_path, lmdb_path, num_games=2173847, max_samples=1000, history
     env = lmdb.open(lmdb_path, map_size=map_size)
 
     current_size = 0
-    TIMER.start(f"Data sample {current_size}/{max_samples}")
+    progress = 0
+    TIMER.start(f"Writing data")
     
     with env.begin(write=True) as txn:
         for tensor, policy, value in encode_pgn_file(pgn_path, history_length, num_games, chunk_size):
-            TIMER.stop(f"Data sample {current_size}/{max_samples}")
-            TIMER.start(f"Data sample {current_size + tensor.shape[0]}/{max_samples}")
             for i in range(tensor.shape[0]):
                 if current_size >= max_samples:
                     break
@@ -310,6 +374,11 @@ def store_lmdb(pgn_path, lmdb_path, num_games=2173847, max_samples=1000, history
                 txn.put(key, pickle.dumps(sample, protocol=pickle.HIGHEST_PROTOCOL))
 
                 current_size += 1
+
+            if current_size / max_samples > progress:
+                TIMER.lap("Writing data", current_size, max_samples)
+                print(f"Currently: {current_size}/{max_samples}")
+                progress += 0.01
 
             if current_size >= max_samples:
                 break
@@ -326,8 +395,8 @@ def store_lmdb(pgn_path, lmdb_path, num_games=2173847, max_samples=1000, history
 if __name__ == "__main__":
     data_path = r'/teamspace/studios/this_studio/chess_bot/datasets/raw/CCRL-4040/CCRL-4040.[2173847].pgn'
     h5py_path = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040.h5'
-    lmdb_path_train = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-train.lmdb'
-    lmdb_path_val = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-val.lmdb'
+    lmdb_path_train = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-train-2m-100k.lmdb'
+    lmdb_path_val = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-val-2m-100k.lmdb'
 
-    store_lmdb(pgn_path=data_path, lmdb_path=lmdb_path_train, max_samples=1000000, history_length=1, chunk_size=5)
+    store_lmdb(pgn_path=data_path, lmdb_path=lmdb_path_train, max_samples=2000000, history_length=1, chunk_size=5)
     store_lmdb(pgn_path=data_path, lmdb_path=lmdb_path_val, max_samples=100000, history_length=1, chunk_size=5)

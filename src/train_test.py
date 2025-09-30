@@ -5,6 +5,7 @@ from torch.utils.data import Dataset, DataLoader
 from torch.amp.grad_scaler import GradScaler
 from torch.amp.autocast_mode import autocast
 import os
+import shutil
 
 from run_timer import TIMER
 from dataloader import CCRL4040LMDBDataset, worker_init_fn
@@ -23,11 +24,17 @@ def train_pipeline(
         weight_decay=0.05, 
         device='cuda', 
         accumulation_steps=1,
+        load_from_checkpoint=None,
         checkpoint_dir='./checkpoints'
     ):
     
     TIMER.start("Initializing training process")
 
+    if load_from_checkpoint is not None:
+        checkpoint = torch.load(load_from_checkpoint)
+        model.load_state_dict(checkpoint)
+
+    shutil.rmtree(checkpoint_dir)
     os.makedirs(checkpoint_dir, exist_ok=True)
     
     model.to(device)
@@ -146,8 +153,8 @@ if __name__ == "__main__":
 
     TIMER.start("Initializing Dataloader")
     # Paths
-    lmdb_path_train = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-train.lmdb'
-    lmdb_path_val = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-val.lmdb'
+    lmdb_path_train = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-train-2m-100k.lmdb'
+    lmdb_path_val = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-val-2m-100k.lmdb'
     checkpoint_path = r'/teamspace/studios/this_studio/chess_bot/results/checkpoints'
 
     # Hyperparameters
@@ -188,3 +195,6 @@ if __name__ == "__main__":
         device=device,
         checkpoint_dir=checkpoint_path,
     )
+
+def test():
+    pass
