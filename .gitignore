@@ -1,2 +1,2 @@
-datasets/
-results/checkpoints/
+datasets/*
+results/checkpoints/*

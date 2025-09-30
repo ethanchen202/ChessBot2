@@ -24,14 +24,14 @@ def train_pipeline(
         weight_decay=0.05, 
         device='cuda', 
         accumulation_steps=1,
-        load_from_checkpoint=None,
-        checkpoint_dir='./checkpoints'
+        load_from_checkpoint_path=None,
+        checkpoint_dir='./results/checkpoints/_last_run'
     ):
     
     TIMER.start("Initializing training process")
 
-    if load_from_checkpoint is not None:
-        checkpoint = torch.load(load_from_checkpoint)
+    if load_from_checkpoint_path is not None:
+        checkpoint = torch.load(load_from_checkpoint_path)
         model.load_state_dict(checkpoint)
 
     shutil.rmtree(checkpoint_dir)
@@ -153,13 +153,13 @@ if __name__ == "__main__":
 
     TIMER.start("Initializing Dataloader")
     # Paths
-    lmdb_path_train = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-train-2m-100k.lmdb'
-    lmdb_path_val = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-val-2m-100k.lmdb'
-    checkpoint_path = r'/teamspace/studios/this_studio/chess_bot/results/checkpoints'
+    lmdb_path_train = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-train.lmdb'
+    lmdb_path_val = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-val.lmdb'
+    checkpoint_path = r'/teamspace/studios/this_studio/chess_bot/results/checkpoints/_test_run_2'
 
     # Hyperparameters
     batch_size = 320
-    accumulation_steps = 2  # effective batch size = batch_size * accumulation_steps
+    accumulation_steps = 1  # effective batch size = batch_size * accumulation_steps
     num_epochs = 200
     
     # Create datasets
@@ -195,6 +195,3 @@ if __name__ == "__main__":
         device=device,
         checkpoint_dir=checkpoint_path,
     )
-
-def test():
-    pass
