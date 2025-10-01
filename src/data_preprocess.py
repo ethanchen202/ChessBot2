@@ -25,9 +25,9 @@ NUM_MOVE_TYPES = 73
 POLICY_VECTOR_SIZE = NUM_SQUARES * NUM_MOVE_TYPES  # 4672
 
 # Directions for sliding pieces (N, S, E, W, NE, NW, SE, SW)
-SLIDING_OFFSETS = {
-    "N": 8, "S": -8, "E": 1, "W": -1, "NE": 9, "NW": 7, "SE": -7, "SW": -9
-}
+# SLIDING_OFFSETS = {
+#     "N": 8, "S": -8, "E": 1, "W": -1, "NE": 9, "NW": 7, "SE": -7, "SW": -9
+# }
 
 # Knight moves: (row_offset, col_offset)
 KNIGHT_OFFSETS = [
@@ -36,11 +36,16 @@ KNIGHT_OFFSETS = [
 ]
 
 # Pawn promotions: straight, capture left, capture right
+# PROMOTION_OFFSETS = [
+#     ("N", None), ("NE", chess.QUEEN), ("NW", chess.QUEEN),
+#     ("NE", chess.ROOK), ("NW", chess.ROOK),
+#     ("NE", chess.BISHOP), ("NW", chess.BISHOP),
+#     ("NE", chess.KNIGHT), ("NW", chess.KNIGHT)
+# ]
 PROMOTION_OFFSETS = [
-    ("N", None), ("NE", chess.QUEEN), ("NW", chess.QUEEN),
-    ("NE", chess.ROOK), ("NW", chess.ROOK),
-    ("NE", chess.BISHOP), ("NW", chess.BISHOP),
-    ("NE", chess.KNIGHT), ("NW", chess.KNIGHT)
+    ("N", chess.ROOK), ("NE", chess.ROOK), ("NW", chess.ROOK),
+    ("N", chess.KNIGHT), ("NE", chess.KNIGHT), ("NW", chess.KNIGHT),
+    ("N", chess.BISHOP), ("NE", chess.BISHOP), ("NW", chess.BISHOP),
 ]
 
 # Value mapping
@@ -132,6 +137,7 @@ def move_to_index(move, board):
         dr = to_row - from_row
         if piece.color == chess.BLACK:
             dr = -dr
+        print(64 + dr - 1)
         move_type = 64 + dr - 1  # approximate
     # King moves (can be treated like single-step sliding)
     elif piece.piece_type == chess.KING:
@@ -213,7 +219,7 @@ def move_to_policy_vector(move, board):
 
 def policy_vector_to_move(tensor, board):
     index = np.argmax(tensor)
-    move = index_to_move(index, board)
+    move = index_to_move(index.item(), board)
     return move
 
 
@@ -283,6 +289,10 @@ def encode_pgn_file(pgn_path, history_length=8, num_games=1000, chunk_size=100):
     """
     global games_processed
 
+    all_games_tensors = []
+    all_policy_tensors = []
+    all_value_tensors = []
+
     with open(pgn_path, "r") as pgn_file:
         game = chess.pgn.read_game(pgn_file)
         skip = games_processed
@@ -291,9 +301,9 @@ def encode_pgn_file(pgn_path, history_length=8, num_games=1000, chunk_size=100):
             game = chess.pgn.read_game(pgn_file)
         TIMER.stop("Skipping already encoded games")
         for chunk in range(num_games // chunk_size):
-            all_games_tensors = []
-            all_policy_tensors = []
-            all_value_tensors = []
+            # all_games_tensors = []
+            # all_policy_tensors = []
+            # all_value_tensors = []
             for _ in range(chunk_size):
                 if game is None:
                     break
@@ -395,8 +405,8 @@ def store_lmdb(pgn_path, lmdb_path, num_games=2173847, max_samples=1000, history
 if __name__ == "__main__":
     data_path = r'/teamspace/studios/this_studio/chess_bot/datasets/raw/CCRL-4040/CCRL-4040.[2173847].pgn'
     h5py_path = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040.h5'
-    lmdb_path_train = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-train-2m-100k.lmdb'
-    lmdb_path_val = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-val-2m-100k.lmdb'
+    lmdb_path_train = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-train-1m-50k.lmdb'
+    lmdb_path_val = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-val-1m-50k.lmdb'
 
-    store_lmdb(pgn_path=data_path, lmdb_path=lmdb_path_train, max_samples=2000000, history_length=1, chunk_size=5)
-    store_lmdb(pgn_path=data_path, lmdb_path=lmdb_path_val, max_samples=100000, history_length=1, chunk_size=5)
+    store_lmdb(pgn_path=data_path, lmdb_path=lmdb_path_train, max_samples=1000000, history_length=1, chunk_size=5)
+    store_lmdb(pgn_path=data_path, lmdb_path=lmdb_path_val, max_samples=50000, history_length=1, chunk_size=5)
