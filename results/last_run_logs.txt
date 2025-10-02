@@ -1427,3 +1427,565 @@ Begin: Training for 3125 batches               Current time: Thu Oct  2 19:02:24
   Lap: Training for 3125 batches               Current time: Thu Oct  2 19:03:13 2025      Time elapsed: 49.71270        ETA: 41.61722s
   Lap: Training for 3125 batches               Current time: Thu Oct  2 19:03:16 2025      Time elapsed: 52.59454        ETA: 38.66473s
   Lap: Training for 3125 batches               Current time: Thu Oct  2 19:03:19 2025      Time elapsed: 55.59448        ETA: 35.79572s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:03:22 2025      Time elapsed: 58.57734        ETA: 32.90401s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:03:25 2025      Time elapsed: 61.46492        ETA: 29.95720s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:03:28 2025      Time elapsed: 64.41400        ETA: 27.04159s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:03:31 2025      Time elapsed: 67.29058        ETA: 24.09711s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:03:34 2025      Time elapsed: 70.21994        ETA: 21.17419s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:03:37 2025      Time elapsed: 73.13179        ETA: 18.24640s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:03:40 2025      Time elapsed: 76.08549        ETA: 15.32826s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:03:43 2025      Time elapsed: 78.99806        ETA: 12.40103s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:03:46 2025      Time elapsed: 81.84254        ETA: 9.46697s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:03:49 2025      Time elapsed: 84.81094        ETA: 6.54866s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:03:51 2025      Time elapsed: 87.71918        ETA: 3.62452s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:03:54 2025      Time elapsed: 90.71162        ETA: 0.70206s
+Epoch 36: Avg Policy Loss=0.1717, Avg Value Loss=0.1049
+  End: Training epoch 36                       Current time: Thu Oct  2 19:03:55 2025      Time elapsed: 91.46543s
+Begin: Validating epoch 36                     Current time: Thu Oct  2 19:03:55 2025      
+Validation: Policy Loss=0.0568, Value Loss=0.0683, Top-1 Acc=0.9748, Top-5 Acc=1.0000
+  End: Validating epoch 36                     Current time: Thu Oct  2 19:03:59 2025      Time elapsed: 3.86317s
+Checkpoint saved to /teamspace/studios/this_studio/chess_bot/results/checkpoints/dataset-1m_lr-1e-4/model_epoch_36.pt
+Begin: Training epoch 37                       Current time: Thu Oct  2 19:03:59 2025      
+Begin: Training for 3125 batches               Current time: Thu Oct  2 19:03:59 2025      
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:03:59 2025      Time elapsed: 0.15153         ETA: 473.41481s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:04:02 2025      Time elapsed: 3.19652         ETA: 95.70590s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:04:05 2025      Time elapsed: 6.08833         ETA: 88.56868s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:04:08 2025      Time elapsed: 9.06793         ETA: 85.07596s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:04:11 2025      Time elapsed: 12.02139        ETA: 81.66153s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:04:14 2025      Time elapsed: 15.02031        ETA: 78.66929s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:04:17 2025      Time elapsed: 18.00633        ETA: 75.62064s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:04:20 2025      Time elapsed: 21.00710        ETA: 72.64084s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:04:23 2025      Time elapsed: 23.93267        ETA: 69.43763s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:04:26 2025      Time elapsed: 26.97080        ETA: 66.57389s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:04:29 2025      Time elapsed: 29.95476        ETA: 63.56036s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:04:32 2025      Time elapsed: 32.87445        ETA: 60.43407s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:04:35 2025      Time elapsed: 35.78396        ETA: 57.32586s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:04:38 2025      Time elapsed: 38.66050        ETA: 54.20197s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:04:41 2025      Time elapsed: 41.56714        ETA: 51.15043s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:04:44 2025      Time elapsed: 44.49613        ETA: 48.14238s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:04:46 2025      Time elapsed: 47.36850        ETA: 45.09032s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:04:49 2025      Time elapsed: 50.27483        ETA: 42.08781s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:04:52 2025      Time elapsed: 53.26933        ETA: 39.16080s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:04:55 2025      Time elapsed: 56.23821        ETA: 36.21019s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:04:58 2025      Time elapsed: 59.12615        ETA: 33.21229s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:05:01 2025      Time elapsed: 62.04273        ETA: 30.23882s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:05:04 2025      Time elapsed: 64.95217        ETA: 27.26752s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:05:07 2025      Time elapsed: 67.85124        ETA: 24.29788s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:05:10 2025      Time elapsed: 70.78365        ETA: 21.34418s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:05:13 2025      Time elapsed: 73.69315        ETA: 18.38646s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:05:16 2025      Time elapsed: 76.51192        ETA: 15.41417s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:05:18 2025      Time elapsed: 79.39332        ETA: 12.46308s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:05:21 2025      Time elapsed: 82.23804        ETA: 9.51272s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:05:24 2025      Time elapsed: 85.10796        ETA: 6.57159s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:05:27 2025      Time elapsed: 88.02327        ETA: 3.63708s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:05:30 2025      Time elapsed: 90.99386        ETA: 0.70424s
+Epoch 37: Avg Policy Loss=0.1676, Avg Value Loss=0.1044
+  End: Training epoch 37                       Current time: Thu Oct  2 19:05:31 2025      Time elapsed: 91.77779s
+Begin: Validating epoch 37                     Current time: Thu Oct  2 19:05:31 2025      
+Validation: Policy Loss=0.0579, Value Loss=0.0693, Top-1 Acc=0.9753, Top-5 Acc=0.9998
+  End: Validating epoch 37                     Current time: Thu Oct  2 19:05:33 2025      Time elapsed: 1.95887s
+Checkpoint saved to /teamspace/studios/this_studio/chess_bot/results/checkpoints/dataset-1m_lr-1e-4/model_epoch_37.pt
+Begin: Training epoch 38                       Current time: Thu Oct  2 19:05:33 2025      
+Begin: Training for 3125 batches               Current time: Thu Oct  2 19:05:33 2025      
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:05:33 2025      Time elapsed: 0.16759         ETA: 523.58065s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:05:36 2025      Time elapsed: 3.13228         ETA: 93.78252s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:05:39 2025      Time elapsed: 6.00827         ETA: 87.40390s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:05:42 2025      Time elapsed: 8.91896         ETA: 83.67833s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:05:45 2025      Time elapsed: 11.90742        ETA: 80.88734s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:05:48 2025      Time elapsed: 14.80014        ETA: 77.51613s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:05:50 2025      Time elapsed: 17.61771        ETA: 73.98854s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:05:53 2025      Time elapsed: 20.52243        ETA: 70.96487s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:05:56 2025      Time elapsed: 23.37742        ETA: 67.82663s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:05:59 2025      Time elapsed: 26.28982        ETA: 64.89298s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:06:02 2025      Time elapsed: 29.17192        ETA: 61.89926s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:06:05 2025      Time elapsed: 32.17039        ETA: 59.13976s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:06:08 2025      Time elapsed: 35.13617        ETA: 56.28810s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:06:11 2025      Time elapsed: 38.10166        ETA: 53.41848s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:06:14 2025      Time elapsed: 41.04123        ETA: 50.50327s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:06:17 2025      Time elapsed: 43.98215        ETA: 47.58629s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:06:20 2025      Time elapsed: 46.95347        ETA: 44.69525s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:06:23 2025      Time elapsed: 49.82874        ETA: 41.71437s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:06:26 2025      Time elapsed: 52.74621        ETA: 38.77623s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:06:29 2025      Time elapsed: 55.69931        ETA: 35.86321s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:06:31 2025      Time elapsed: 58.59341        ETA: 32.91304s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:06:35 2025      Time elapsed: 61.66582        ETA: 30.05512s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:06:37 2025      Time elapsed: 64.57138        ETA: 27.10766s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:06:40 2025      Time elapsed: 67.41320        ETA: 24.14102s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:06:43 2025      Time elapsed: 70.32594        ETA: 21.20616s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:06:46 2025      Time elapsed: 73.24864        ETA: 18.27555s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:06:49 2025      Time elapsed: 76.14063        ETA: 15.33937s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:06:52 2025      Time elapsed: 78.95157        ETA: 12.39373s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:06:55 2025      Time elapsed: 81.81171        ETA: 9.46340s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:06:58 2025      Time elapsed: 84.69052        ETA: 6.53936s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:07:00 2025      Time elapsed: 87.57112        ETA: 3.61840s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:07:03 2025      Time elapsed: 90.49258        ETA: 0.70036s
+Epoch 38: Avg Policy Loss=0.1634, Avg Value Loss=0.1033
+  End: Training epoch 38                       Current time: Thu Oct  2 19:07:04 2025      Time elapsed: 91.22720s
+Begin: Validating epoch 38                     Current time: Thu Oct  2 19:07:04 2025      
+Validation: Policy Loss=0.0586, Value Loss=0.0692, Top-1 Acc=0.9750, Top-5 Acc=0.9999
+  End: Validating epoch 38                     Current time: Thu Oct  2 19:07:06 2025      Time elapsed: 1.76378s
+Checkpoint saved to /teamspace/studios/this_studio/chess_bot/results/checkpoints/dataset-1m_lr-1e-4/model_epoch_38.pt
+Begin: Training epoch 39                       Current time: Thu Oct  2 19:07:06 2025      
+Begin: Training for 3125 batches               Current time: Thu Oct  2 19:07:06 2025      
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:07:06 2025      Time elapsed: 0.14466         ETA: 451.92602s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:07:09 2025      Time elapsed: 3.09270         ETA: 92.59748s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:07:12 2025      Time elapsed: 6.02098         ETA: 87.58886s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:07:15 2025      Time elapsed: 8.85599         ETA: 83.08745s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:07:18 2025      Time elapsed: 11.81084        ETA: 80.23130s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:07:20 2025      Time elapsed: 14.62106        ETA: 76.57821s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:07:23 2025      Time elapsed: 17.59807        ETA: 73.90604s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:07:26 2025      Time elapsed: 20.39204        ETA: 70.51402s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:07:29 2025      Time elapsed: 23.34821        ETA: 67.74187s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:07:32 2025      Time elapsed: 26.30037        ETA: 64.91903s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:07:35 2025      Time elapsed: 29.26037        ETA: 62.08697s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:07:38 2025      Time elapsed: 32.18447        ETA: 59.16565s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:07:41 2025      Time elapsed: 35.04402        ETA: 56.14048s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:07:44 2025      Time elapsed: 37.93124        ETA: 53.17955s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:07:47 2025      Time elapsed: 40.83541        ETA: 50.25001s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:07:50 2025      Time elapsed: 43.69807        ETA: 47.27895s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:07:52 2025      Time elapsed: 46.61522        ETA: 44.37327s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:07:55 2025      Time elapsed: 49.55168        ETA: 41.48242s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:07:58 2025      Time elapsed: 52.47494        ETA: 38.57681s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:08:01 2025      Time elapsed: 55.36259        ETA: 35.64641s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:08:04 2025      Time elapsed: 58.29577        ETA: 32.74585s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:08:07 2025      Time elapsed: 61.31162        ETA: 29.88249s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:08:10 2025      Time elapsed: 64.28396        ETA: 26.98700s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:08:13 2025      Time elapsed: 67.21728        ETA: 24.07086s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:08:16 2025      Time elapsed: 70.12607        ETA: 21.14589s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:08:19 2025      Time elapsed: 73.10853        ETA: 18.24059s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:08:22 2025      Time elapsed: 76.01495        ETA: 15.31405s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:08:25 2025      Time elapsed: 79.22750        ETA: 12.43705s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:08:29 2025      Time elapsed: 82.71471        ETA: 9.56786s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:08:31 2025      Time elapsed: 85.61389        ETA: 6.61065s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:08:34 2025      Time elapsed: 88.44129        ETA: 3.65435s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:08:37 2025      Time elapsed: 91.36413        ETA: 0.70711s
+Epoch 39: Avg Policy Loss=0.1594, Avg Value Loss=0.1025
+  End: Training epoch 39                       Current time: Thu Oct  2 19:08:38 2025      Time elapsed: 92.30912s
+Begin: Validating epoch 39                     Current time: Thu Oct  2 19:08:38 2025      
+Validation: Policy Loss=0.0578, Value Loss=0.0691, Top-1 Acc=0.9745, Top-5 Acc=0.9999
+  End: Validating epoch 39                     Current time: Thu Oct  2 19:08:44 2025      Time elapsed: 5.98331s
+Checkpoint saved to /teamspace/studios/this_studio/chess_bot/results/checkpoints/dataset-1m_lr-1e-4/model_epoch_39.pt
+Begin: Training epoch 40                       Current time: Thu Oct  2 19:08:44 2025      
+Begin: Training for 3125 batches               Current time: Thu Oct  2 19:08:44 2025      
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:08:44 2025      Time elapsed: 0.15951         ETA: 498.31562s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:08:47 2025      Time elapsed: 2.98679         ETA: 89.42637s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:08:50 2025      Time elapsed: 5.85759         ETA: 85.21203s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:08:53 2025      Time elapsed: 8.89060         ETA: 83.41220s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:08:56 2025      Time elapsed: 11.85908        ETA: 80.55897s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:08:59 2025      Time elapsed: 14.77034        ETA: 77.36008s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:09:02 2025      Time elapsed: 17.63135        ETA: 74.04584s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:09:05 2025      Time elapsed: 20.54157        ETA: 71.03110s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:09:08 2025      Time elapsed: 23.38368        ETA: 67.84480s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:09:10 2025      Time elapsed: 26.23965        ETA: 64.76914s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:09:13 2025      Time elapsed: 29.18247        ETA: 61.92165s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:09:16 2025      Time elapsed: 32.00159        ETA: 58.82946s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:09:19 2025      Time elapsed: 34.76464        ETA: 55.69292s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:09:22 2025      Time elapsed: 37.61549        ETA: 52.73686s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:09:25 2025      Time elapsed: 40.39914        ETA: 49.71315s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:09:27 2025      Time elapsed: 43.29014        ETA: 46.83758s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:09:30 2025      Time elapsed: 46.15107        ETA: 43.93144s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:09:33 2025      Time elapsed: 49.05451        ETA: 41.06621s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:09:36 2025      Time elapsed: 52.01101        ETA: 38.23575s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:09:39 2025      Time elapsed: 54.90990        ETA: 35.35493s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:09:42 2025      Time elapsed: 57.81068        ETA: 32.47337s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:09:45 2025      Time elapsed: 60.67284        ETA: 29.57115s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:09:48 2025      Time elapsed: 63.64425        ETA: 26.71844s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:09:51 2025      Time elapsed: 66.58647        ETA: 23.84496s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:09:54 2025      Time elapsed: 69.58262        ETA: 20.98201s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:09:57 2025      Time elapsed: 72.47893        ETA: 18.08351s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:10:00 2025      Time elapsed: 75.53116        ETA: 15.21658s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:10:03 2025      Time elapsed: 78.50430        ETA: 12.32352s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:10:06 2025      Time elapsed: 81.50947        ETA: 9.42844s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:10:09 2025      Time elapsed: 84.50044        ETA: 6.52468s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:10:12 2025      Time elapsed: 87.42028        ETA: 3.61217s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:10:15 2025      Time elapsed: 90.41601        ETA: 0.69977s
+Epoch 40: Avg Policy Loss=0.1558, Avg Value Loss=0.1018
+  End: Training epoch 40                       Current time: Thu Oct  2 19:10:15 2025      Time elapsed: 91.22395s
+Begin: Validating epoch 40                     Current time: Thu Oct  2 19:10:15 2025      
+Validation: Policy Loss=0.0554, Value Loss=0.0695, Top-1 Acc=0.9751, Top-5 Acc=0.9999
+  End: Validating epoch 40                     Current time: Thu Oct  2 19:10:17 2025      Time elapsed: 2.05245s
+Checkpoint saved to /teamspace/studios/this_studio/chess_bot/results/checkpoints/dataset-1m_lr-1e-4/model_epoch_40.pt
+Begin: Training epoch 41                       Current time: Thu Oct  2 19:10:18 2025      
+Begin: Training for 3125 batches               Current time: Thu Oct  2 19:10:18 2025      
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:10:18 2025      Time elapsed: 0.87598         ETA: 2736.59398s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:10:22 2025      Time elapsed: 4.34265         ETA: 130.02159s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:10:25 2025      Time elapsed: 7.31388         ETA: 106.39709s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:10:28 2025      Time elapsed: 10.29162        ETA: 96.55666s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:10:31 2025      Time elapsed: 13.16548        ETA: 89.43339s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:10:34 2025      Time elapsed: 16.11959        ETA: 84.42677s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:10:36 2025      Time elapsed: 18.92095        ETA: 79.46171s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:10:39 2025      Time elapsed: 21.88669        ETA: 75.68240s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:10:42 2025      Time elapsed: 24.91384        ETA: 72.28437s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:10:45 2025      Time elapsed: 27.81259        ETA: 68.65175s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:10:48 2025      Time elapsed: 30.80478        ETA: 65.36401s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:10:51 2025      Time elapsed: 33.69118        ETA: 61.93548s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:10:54 2025      Time elapsed: 36.59788        ETA: 58.62975s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:10:57 2025      Time elapsed: 39.46417        ETA: 55.32872s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:11:00 2025      Time elapsed: 42.31918        ETA: 52.07585s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:11:03 2025      Time elapsed: 45.18944        ETA: 48.89251s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:11:05 2025      Time elapsed: 47.96177        ETA: 45.65506s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:11:08 2025      Time elapsed: 50.88785        ETA: 42.60101s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:11:11 2025      Time elapsed: 53.78714        ETA: 39.54147s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:11:14 2025      Time elapsed: 56.72411        ETA: 36.52305s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:11:17 2025      Time elapsed: 59.55418        ETA: 33.45273s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:11:20 2025      Time elapsed: 62.43465        ETA: 30.42984s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:11:23 2025      Time elapsed: 65.33619        ETA: 27.42874s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:11:26 2025      Time elapsed: 68.22549        ETA: 24.43190s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:11:29 2025      Time elapsed: 71.17427        ETA: 21.46196s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:11:32 2025      Time elapsed: 74.09131        ETA: 18.48580s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:11:34 2025      Time elapsed: 76.98064        ETA: 15.50860s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:11:37 2025      Time elapsed: 79.92368        ETA: 12.54633s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:11:40 2025      Time elapsed: 82.77211        ETA: 9.57450s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:11:43 2025      Time elapsed: 85.78982        ETA: 6.62424s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:11:46 2025      Time elapsed: 88.78320        ETA: 3.66848s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:11:49 2025      Time elapsed: 91.75215        ETA: 0.71011s
+Epoch 41: Avg Policy Loss=0.1525, Avg Value Loss=0.1011
+  End: Training epoch 41                       Current time: Thu Oct  2 19:11:51 2025      Time elapsed: 93.20548s
+Begin: Validating epoch 41                     Current time: Thu Oct  2 19:11:51 2025      
+Validation: Policy Loss=0.0559, Value Loss=0.0683, Top-1 Acc=0.9761, Top-5 Acc=0.9999
+  End: Validating epoch 41                     Current time: Thu Oct  2 19:11:53 2025      Time elapsed: 2.52672s
+Checkpoint saved to /teamspace/studios/this_studio/chess_bot/results/checkpoints/dataset-1m_lr-1e-4/model_epoch_41.pt
+Begin: Training epoch 42                       Current time: Thu Oct  2 19:11:53 2025      
+Begin: Training for 3125 batches               Current time: Thu Oct  2 19:11:53 2025      
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:11:53 2025      Time elapsed: 0.17578         ETA: 549.15105s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:11:56 2025      Time elapsed: 3.21296         ETA: 96.19823s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:11:59 2025      Time elapsed: 6.20391         ETA: 90.24998s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:12:02 2025      Time elapsed: 9.10241         ETA: 85.39937s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:12:05 2025      Time elapsed: 12.07053        ETA: 81.99540s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:12:08 2025      Time elapsed: 14.95933        ETA: 78.34990s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:12:11 2025      Time elapsed: 17.90509        ETA: 75.19546s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:12:14 2025      Time elapsed: 20.74559        ETA: 71.73657s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:12:17 2025      Time elapsed: 23.73233        ETA: 68.85635s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:12:20 2025      Time elapsed: 26.67215        ETA: 65.83672s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:12:23 2025      Time elapsed: 29.58317        ETA: 62.77189s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:12:26 2025      Time elapsed: 32.42205        ETA: 59.60241s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:12:29 2025      Time elapsed: 35.29193        ETA: 56.53762s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:12:31 2025      Time elapsed: 38.10702        ETA: 53.42599s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:12:34 2025      Time elapsed: 41.00586        ETA: 50.45975s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:12:37 2025      Time elapsed: 43.83425        ETA: 47.42627s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:12:40 2025      Time elapsed: 46.68980        ETA: 44.44426s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:12:43 2025      Time elapsed: 49.53673        ETA: 41.46991s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:12:46 2025      Time elapsed: 52.43081        ETA: 38.54436s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:12:49 2025      Time elapsed: 55.37808        ETA: 35.65638s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:12:52 2025      Time elapsed: 58.29390        ETA: 32.74480s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:12:55 2025      Time elapsed: 61.22749        ETA: 29.84148s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:12:57 2025      Time elapsed: 64.15970        ETA: 26.93483s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:13:00 2025      Time elapsed: 67.02352        ETA: 24.00147s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:13:03 2025      Time elapsed: 69.94358        ETA: 21.09086s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:13:06 2025      Time elapsed: 72.78938        ETA: 18.16097s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:13:09 2025      Time elapsed: 75.72625        ETA: 15.25588s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:13:12 2025      Time elapsed: 78.62497        ETA: 12.34246s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:13:15 2025      Time elapsed: 81.59079        ETA: 9.43785s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:13:18 2025      Time elapsed: 84.55183        ETA: 6.52865s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:13:21 2025      Time elapsed: 87.51812        ETA: 3.61621s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:13:24 2025      Time elapsed: 91.18636        ETA: 0.70573s
+Epoch 42: Avg Policy Loss=0.1493, Avg Value Loss=0.1004
+  End: Training epoch 42                       Current time: Thu Oct  2 19:13:26 2025      Time elapsed: 92.45642s
+Begin: Validating epoch 42                     Current time: Thu Oct  2 19:13:26 2025      
+Validation: Policy Loss=0.0559, Value Loss=0.0699, Top-1 Acc=0.9775, Top-5 Acc=0.9999
+  End: Validating epoch 42                     Current time: Thu Oct  2 19:13:31 2025      Time elapsed: 4.87184s
+Checkpoint saved to /teamspace/studios/this_studio/chess_bot/results/checkpoints/dataset-1m_lr-1e-4/model_epoch_42.pt
+Begin: Training epoch 43                       Current time: Thu Oct  2 19:13:31 2025      
+Begin: Training for 3125 batches               Current time: Thu Oct  2 19:13:31 2025      
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:13:31 2025      Time elapsed: 0.16118         ETA: 503.54202s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:13:34 2025      Time elapsed: 3.04965         ETA: 91.30859s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:13:37 2025      Time elapsed: 5.96393         ETA: 86.75893s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:13:40 2025      Time elapsed: 8.89453         ETA: 83.44905s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:13:43 2025      Time elapsed: 11.85703        ETA: 80.54503s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:13:45 2025      Time elapsed: 14.68132        ETA: 76.89384s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:13:48 2025      Time elapsed: 17.62129        ETA: 74.00356s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:13:51 2025      Time elapsed: 20.45596        ETA: 70.73504s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:13:54 2025      Time elapsed: 23.33402        ETA: 67.70074s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:13:57 2025      Time elapsed: 26.13724        ETA: 64.51636s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:14:00 2025      Time elapsed: 29.00148        ETA: 61.53763s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:14:03 2025      Time elapsed: 31.95725        ETA: 58.74794s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:14:05 2025      Time elapsed: 34.76843        ETA: 55.69897s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:14:08 2025      Time elapsed: 37.66647        ETA: 52.80834s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:14:11 2025      Time elapsed: 40.65532        ETA: 50.02839s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:14:14 2025      Time elapsed: 43.49911        ETA: 47.06367s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:14:17 2025      Time elapsed: 46.43003        ETA: 44.19699s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:14:20 2025      Time elapsed: 49.34940        ETA: 41.31308s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:14:23 2025      Time elapsed: 52.32085        ETA: 38.46353s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:14:26 2025      Time elapsed: 55.21188        ETA: 35.54937s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:14:29 2025      Time elapsed: 58.13889        ETA: 32.65773s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:14:32 2025      Time elapsed: 60.95029        ETA: 29.70638s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:14:35 2025      Time elapsed: 63.86565        ETA: 26.81139s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:14:37 2025      Time elapsed: 66.69622        ETA: 23.88426s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:14:40 2025      Time elapsed: 69.62306        ETA: 20.99421s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:14:43 2025      Time elapsed: 72.49222        ETA: 18.08682s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:14:46 2025      Time elapsed: 75.37806        ETA: 15.18574s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:14:49 2025      Time elapsed: 78.29880        ETA: 12.29126s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:14:52 2025      Time elapsed: 81.20316        ETA: 9.39301s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:14:55 2025      Time elapsed: 84.10952        ETA: 6.49450s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:14:58 2025      Time elapsed: 87.07813        ETA: 3.59803s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:15:01 2025      Time elapsed: 90.04603        ETA: 0.69690s
+Epoch 43: Avg Policy Loss=0.1465, Avg Value Loss=0.0999
+  End: Training epoch 43                       Current time: Thu Oct  2 19:15:02 2025      Time elapsed: 90.89777s
+Begin: Validating epoch 43                     Current time: Thu Oct  2 19:15:02 2025      
+Validation: Policy Loss=0.0550, Value Loss=0.0685, Top-1 Acc=0.9762, Top-5 Acc=1.0000
+  End: Validating epoch 43                     Current time: Thu Oct  2 19:15:04 2025      Time elapsed: 2.17615s
+Checkpoint saved to /teamspace/studios/this_studio/chess_bot/results/checkpoints/dataset-1m_lr-1e-4/model_epoch_43.pt
+Begin: Training epoch 44                       Current time: Thu Oct  2 19:15:04 2025      
+Begin: Training for 3125 batches               Current time: Thu Oct  2 19:15:04 2025      
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:15:04 2025      Time elapsed: 0.15772         ETA: 492.73245s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:15:07 2025      Time elapsed: 3.08838         ETA: 92.46830s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:15:10 2025      Time elapsed: 6.11715         ETA: 88.98791s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:15:13 2025      Time elapsed: 9.05258         ETA: 84.93192s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:15:16 2025      Time elapsed: 11.96856        ETA: 81.30270s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:15:19 2025      Time elapsed: 14.84200        ETA: 77.73539s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:15:22 2025      Time elapsed: 17.77237        ETA: 74.63808s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:15:24 2025      Time elapsed: 20.63463        ETA: 71.35287s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:15:27 2025      Time elapsed: 23.59818        ETA: 68.46724s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:15:30 2025      Time elapsed: 26.57014        ETA: 65.58491s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:15:33 2025      Time elapsed: 29.54866        ETA: 62.69866s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:15:36 2025      Time elapsed: 32.57805        ETA: 59.88918s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:15:39 2025      Time elapsed: 35.47400        ETA: 56.82930s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:15:42 2025      Time elapsed: 38.41453        ETA: 53.85712s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:15:45 2025      Time elapsed: 41.12707        ETA: 50.60890s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:15:48 2025      Time elapsed: 44.05682        ETA: 47.66708s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:15:51 2025      Time elapsed: 46.91017        ETA: 44.65403s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:15:54 2025      Time elapsed: 49.75421        ETA: 41.65198s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:15:56 2025      Time elapsed: 52.60870        ETA: 38.67514s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:15:59 2025      Time elapsed: 55.45812        ETA: 35.70791s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:16:02 2025      Time elapsed: 58.28856        ETA: 32.74180s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:16:05 2025      Time elapsed: 61.18844        ETA: 29.82245s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:16:08 2025      Time elapsed: 64.03556        ETA: 26.88272s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:16:11 2025      Time elapsed: 66.97584        ETA: 23.98440s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:16:14 2025      Time elapsed: 69.88502        ETA: 21.07320s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:16:17 2025      Time elapsed: 72.78345        ETA: 18.15949s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:16:19 2025      Time elapsed: 75.67777        ETA: 15.24612s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:16:22 2025      Time elapsed: 78.56401        ETA: 12.33289s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:16:25 2025      Time elapsed: 81.39782        ETA: 9.41553s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:16:28 2025      Time elapsed: 84.25778        ETA: 6.50594s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:16:31 2025      Time elapsed: 87.17187        ETA: 3.60190s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:16:34 2025      Time elapsed: 90.20402        ETA: 0.69813s
+Epoch 44: Avg Policy Loss=0.1446, Avg Value Loss=0.0993
+  End: Training epoch 44                       Current time: Thu Oct  2 19:16:35 2025      Time elapsed: 91.09567s
+Begin: Validating epoch 44                     Current time: Thu Oct  2 19:16:35 2025      
+Validation: Policy Loss=0.0538, Value Loss=0.0680, Top-1 Acc=0.9764, Top-5 Acc=1.0000
+  End: Validating epoch 44                     Current time: Thu Oct  2 19:16:37 2025      Time elapsed: 2.28672s
+Checkpoint saved to /teamspace/studios/this_studio/chess_bot/results/checkpoints/dataset-1m_lr-1e-4/model_epoch_44.pt
+Begin: Training epoch 45                       Current time: Thu Oct  2 19:16:37 2025      
+Begin: Training for 3125 batches               Current time: Thu Oct  2 19:16:37 2025      
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:16:37 2025      Time elapsed: 0.15675         ETA: 489.71817s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:16:40 2025      Time elapsed: 3.00767         ETA: 90.05175s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:16:43 2025      Time elapsed: 5.89105         ETA: 85.69877s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:16:46 2025      Time elapsed: 8.70470         ETA: 81.66811s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:16:49 2025      Time elapsed: 11.57392        ETA: 78.62187s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:16:52 2025      Time elapsed: 14.35874        ETA: 75.20427s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:16:54 2025      Time elapsed: 17.16706        ETA: 72.09596s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:16:57 2025      Time elapsed: 20.09141        ETA: 69.47445s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:17:00 2025      Time elapsed: 22.83228        ETA: 66.24499s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:17:03 2025      Time elapsed: 25.69332        ETA: 63.42060s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:17:06 2025      Time elapsed: 28.57958        ETA: 60.64240s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:17:09 2025      Time elapsed: 31.50281        ETA: 57.91253s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:17:12 2025      Time elapsed: 34.36708        ETA: 55.05601s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:17:14 2025      Time elapsed: 37.29723        ETA: 52.29067s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:17:17 2025      Time elapsed: 40.16920        ETA: 49.43020s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:17:20 2025      Time elapsed: 43.06242        ETA: 46.59119s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:17:23 2025      Time elapsed: 46.02992        ETA: 43.81612s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:17:26 2025      Time elapsed: 48.97506        ETA: 40.99970s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:17:29 2025      Time elapsed: 51.83658        ETA: 38.10752s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:17:32 2025      Time elapsed: 54.77268        ETA: 35.26658s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:17:35 2025      Time elapsed: 57.65174        ETA: 32.38409s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:17:38 2025      Time elapsed: 60.61801        ETA: 29.54443s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:17:41 2025      Time elapsed: 63.53108        ETA: 26.67093s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:17:44 2025      Time elapsed: 66.42366        ETA: 23.78666s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:17:47 2025      Time elapsed: 69.32352        ETA: 20.90389s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:17:49 2025      Time elapsed: 72.15598        ETA: 18.00293s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:17:52 2025      Time elapsed: 75.05997        ETA: 15.12166s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:17:55 2025      Time elapsed: 77.88077        ETA: 12.22564s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:17:58 2025      Time elapsed: 80.71920        ETA: 9.33703s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:18:01 2025      Time elapsed: 83.60632        ETA: 6.45564s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:18:04 2025      Time elapsed: 86.56104        ETA: 3.57666s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:18:07 2025      Time elapsed: 89.56719        ETA: 0.69320s
+Epoch 45: Avg Policy Loss=0.1415, Avg Value Loss=0.0988
+  End: Training epoch 45                       Current time: Thu Oct  2 19:18:08 2025      Time elapsed: 90.37976s
+Begin: Validating epoch 45                     Current time: Thu Oct  2 19:18:08 2025      
+Validation: Policy Loss=0.0547, Value Loss=0.0693, Top-1 Acc=0.9752, Top-5 Acc=0.9999
+  End: Validating epoch 45                     Current time: Thu Oct  2 19:18:12 2025      Time elapsed: 4.35076s
+Checkpoint saved to /teamspace/studios/this_studio/chess_bot/results/checkpoints/dataset-1m_lr-1e-4/model_epoch_45.pt
+Begin: Training epoch 46                       Current time: Thu Oct  2 19:18:12 2025      
+Begin: Training for 3125 batches               Current time: Thu Oct  2 19:18:12 2025      
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:18:13 2025      Time elapsed: 0.46109         ETA: 1440.46703s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:18:16 2025      Time elapsed: 3.83402         ETA: 114.79288s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:18:19 2025      Time elapsed: 6.90179         ETA: 100.40224s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:18:22 2025      Time elapsed: 9.78862         ETA: 91.83750s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:18:25 2025      Time elapsed: 12.76872        ETA: 86.73815s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:18:28 2025      Time elapsed: 15.60414        ETA: 81.72709s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:18:30 2025      Time elapsed: 18.44602        ETA: 77.46717s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:18:33 2025      Time elapsed: 21.39384        ETA: 73.97813s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:18:36 2025      Time elapsed: 24.21977        ETA: 70.27061s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:18:39 2025      Time elapsed: 26.98975        ETA: 66.62065s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:18:42 2025      Time elapsed: 29.88371        ETA: 63.40961s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:18:45 2025      Time elapsed: 32.75428        ETA: 60.21315s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:18:48 2025      Time elapsed: 35.69428        ETA: 57.18219s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:18:51 2025      Time elapsed: 38.54827        ETA: 54.04462s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:18:54 2025      Time elapsed: 41.49922        ETA: 51.06686s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:18:56 2025      Time elapsed: 44.33102        ETA: 47.96374s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:18:59 2025      Time elapsed: 47.18207        ETA: 44.91287s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:19:02 2025      Time elapsed: 50.01101        ETA: 41.86696s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:19:05 2025      Time elapsed: 52.90302        ETA: 38.89151s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:19:08 2025      Time elapsed: 55.74750        ETA: 35.89424s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:19:11 2025      Time elapsed: 58.58255        ETA: 32.90694s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:19:14 2025      Time elapsed: 61.48903        ETA: 29.96895s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:19:16 2025      Time elapsed: 64.28783        ETA: 26.98862s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:19:19 2025      Time elapsed: 67.12029        ETA: 24.03612s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:19:22 2025      Time elapsed: 70.02896        ETA: 21.11661s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:19:25 2025      Time elapsed: 72.97937        ETA: 18.20837s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:19:28 2025      Time elapsed: 75.89756        ETA: 15.29040s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:19:31 2025      Time elapsed: 78.83314        ETA: 12.37514s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:19:34 2025      Time elapsed: 81.81824        ETA: 9.46416s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:19:37 2025      Time elapsed: 84.79709        ETA: 6.54759s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:19:40 2025      Time elapsed: 87.89596        ETA: 3.63182s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:19:43 2025      Time elapsed: 90.90633        ETA: 0.70356s
+Epoch 46: Avg Policy Loss=0.1390, Avg Value Loss=0.0983
+  End: Training epoch 46                       Current time: Thu Oct  2 19:19:44 2025      Time elapsed: 91.71734s
+Begin: Validating epoch 46                     Current time: Thu Oct  2 19:19:44 2025      
+Validation: Policy Loss=0.0579, Value Loss=0.0676, Top-1 Acc=0.9754, Top-5 Acc=0.9999
+  End: Validating epoch 46                     Current time: Thu Oct  2 19:19:46 2025      Time elapsed: 1.91730s
+Checkpoint saved to /teamspace/studios/this_studio/chess_bot/results/checkpoints/dataset-1m_lr-1e-4/model_epoch_46.pt
+Begin: Training epoch 47                       Current time: Thu Oct  2 19:19:46 2025      
+Begin: Training for 3125 batches               Current time: Thu Oct  2 19:19:46 2025      
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:19:46 2025      Time elapsed: 0.14764         ETA: 461.25265s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:19:49 2025      Time elapsed: 3.09750         ETA: 92.74134s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:19:52 2025      Time elapsed: 5.99531         ETA: 87.21545s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:19:55 2025      Time elapsed: 8.92861         ETA: 83.76884s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:19:58 2025      Time elapsed: 11.94501        ETA: 81.14271s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:20:01 2025      Time elapsed: 14.85599        ETA: 77.80865s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:20:03 2025      Time elapsed: 17.75621        ETA: 74.57021s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:20:06 2025      Time elapsed: 20.66838        ETA: 71.46957s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:20:09 2025      Time elapsed: 23.52411        ETA: 68.25225s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:20:12 2025      Time elapsed: 26.50048        ETA: 65.41297s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:20:15 2025      Time elapsed: 29.36946        ETA: 62.31844s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:20:18 2025      Time elapsed: 32.28715        ETA: 59.35441s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:20:21 2025      Time elapsed: 35.12847        ETA: 56.27576s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:20:24 2025      Time elapsed: 38.03141        ETA: 53.31999s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:20:27 2025      Time elapsed: 40.96110        ETA: 50.40467s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:20:30 2025      Time elapsed: 43.85144        ETA: 47.44487s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:20:32 2025      Time elapsed: 46.73213        ETA: 44.48456s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:20:35 2025      Time elapsed: 49.58879        ETA: 41.51349s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:20:38 2025      Time elapsed: 52.46343        ETA: 38.56834s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:20:41 2025      Time elapsed: 55.32202        ETA: 35.62029s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:20:44 2025      Time elapsed: 58.19429        ETA: 32.68885s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:20:47 2025      Time elapsed: 61.15887        ETA: 29.80804s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:20:50 2025      Time elapsed: 64.02282        ETA: 26.87737s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:20:53 2025      Time elapsed: 66.92033        ETA: 23.96452s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:20:55 2025      Time elapsed: 69.78692        ETA: 21.04362s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:20:58 2025      Time elapsed: 72.70619        ETA: 18.14021s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:21:01 2025      Time elapsed: 75.52562        ETA: 15.21546s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:21:04 2025      Time elapsed: 78.44842        ETA: 12.31475s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:21:07 2025      Time elapsed: 81.32923        ETA: 9.40759s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:21:10 2025      Time elapsed: 84.28761        ETA: 6.50825s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:21:13 2025      Time elapsed: 87.29939        ETA: 3.60717s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:21:16 2025      Time elapsed: 90.46259        ETA: 0.70013s
+Epoch 47: Avg Policy Loss=0.1370, Avg Value Loss=0.0977
+  End: Training epoch 47                       Current time: Thu Oct  2 19:21:17 2025      Time elapsed: 91.73061s
+Begin: Validating epoch 47                     Current time: Thu Oct  2 19:21:17 2025      
+Validation: Policy Loss=0.0573, Value Loss=0.0667, Top-1 Acc=0.9747, Top-5 Acc=0.9999
+  End: Validating epoch 47                     Current time: Thu Oct  2 19:21:24 2025      Time elapsed: 6.23880s
+Checkpoint saved to /teamspace/studios/this_studio/chess_bot/results/checkpoints/dataset-1m_lr-1e-4/model_epoch_47.pt
+Begin: Training epoch 48                       Current time: Thu Oct  2 19:21:24 2025      
+Begin: Training for 3125 batches               Current time: Thu Oct  2 19:21:24 2025      
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:21:24 2025      Time elapsed: 0.17037         ETA: 532.26450s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:21:27 2025      Time elapsed: 3.12713         ETA: 93.62824s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:21:30 2025      Time elapsed: 5.97807         ETA: 86.96471s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:21:33 2025      Time elapsed: 8.92447         ETA: 83.72996s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:21:36 2025      Time elapsed: 11.81298        ETA: 80.24585s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:21:39 2025      Time elapsed: 14.78951        ETA: 77.46047s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:21:41 2025      Time elapsed: 17.66764        ETA: 74.19823s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:21:44 2025      Time elapsed: 20.58682        ETA: 71.18753s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:21:47 2025      Time elapsed: 23.49492        ETA: 68.16754s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:21:50 2025      Time elapsed: 26.45166        ETA: 65.29246s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:21:53 2025      Time elapsed: 29.27942        ETA: 62.12737s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:21:56 2025      Time elapsed: 32.11545        ETA: 59.03877s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:21:59 2025      Time elapsed: 35.01530        ETA: 56.09447s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:22:02 2025      Time elapsed: 37.95189        ETA: 53.20850s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:22:05 2025      Time elapsed: 40.79189        ETA: 50.19645s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:22:07 2025      Time elapsed: 43.64906        ETA: 47.22590s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:22:10 2025      Time elapsed: 46.47105        ETA: 44.23603s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:22:13 2025      Time elapsed: 49.35065        ETA: 41.31413s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:22:16 2025      Time elapsed: 52.19686        ETA: 38.37238s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:22:19 2025      Time elapsed: 55.08604        ETA: 35.46834s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:22:22 2025      Time elapsed: 57.91668        ETA: 32.53291s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:22:25 2025      Time elapsed: 60.80383        ETA: 29.63500s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:22:27 2025      Time elapsed: 63.66931        ETA: 26.72896s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:22:30 2025      Time elapsed: 66.53053        ETA: 23.82493s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:22:33 2025      Time elapsed: 69.46283        ETA: 20.94590s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:22:36 2025      Time elapsed: 72.39016        ETA: 18.06136s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:22:39 2025      Time elapsed: 75.32072        ETA: 15.17419s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:22:42 2025      Time elapsed: 78.32184        ETA: 12.29488s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:22:45 2025      Time elapsed: 81.22207        ETA: 9.39520s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:22:48 2025      Time elapsed: 84.26529        ETA: 6.50652s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:22:51 2025      Time elapsed: 87.26635        ETA: 3.60581s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:22:54 2025      Time elapsed: 90.31109        ETA: 0.69896s
+Epoch 48: Avg Policy Loss=0.1349, Avg Value Loss=0.0973
+  End: Training epoch 48                       Current time: Thu Oct  2 19:22:55 2025      Time elapsed: 91.10701s
+Begin: Validating epoch 48                     Current time: Thu Oct  2 19:22:55 2025      
+Validation: Policy Loss=0.0527, Value Loss=0.0678, Top-1 Acc=0.9764, Top-5 Acc=0.9999
+  End: Validating epoch 48                     Current time: Thu Oct  2 19:22:57 2025      Time elapsed: 1.97756s
+Checkpoint saved to /teamspace/studios/this_studio/chess_bot/results/checkpoints/dataset-1m_lr-1e-4/model_epoch_48.pt
+Begin: Training epoch 49                       Current time: Thu Oct  2 19:22:57 2025      
+Begin: Training for 3125 batches               Current time: Thu Oct  2 19:22:57 2025      
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:22:57 2025      Time elapsed: 0.18717         ETA: 584.73109s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:23:00 2025      Time elapsed: 3.14718         ETA: 94.22871s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:23:03 2025      Time elapsed: 6.04595         ETA: 87.95210s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:23:06 2025      Time elapsed: 8.97553         ETA: 84.20900s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:23:09 2025      Time elapsed: 11.81050        ETA: 80.22902s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:23:12 2025      Time elapsed: 14.78239        ETA: 77.42316s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:23:14 2025      Time elapsed: 17.63515        ETA: 74.06179s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:23:17 2025      Time elapsed: 20.48352        ETA: 70.83035s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:23:20 2025      Time elapsed: 23.31295        ETA: 67.63959s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:23:23 2025      Time elapsed: 26.20081        ETA: 64.67328s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:23:26 2025      Time elapsed: 29.05542        ETA: 61.65208s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:23:29 2025      Time elapsed: 31.98269        ETA: 58.79471s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:23:32 2025      Time elapsed: 34.76763        ETA: 55.69769s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:23:34 2025      Time elapsed: 37.64113        ETA: 52.77281s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:23:37 2025      Time elapsed: 40.49910        ETA: 49.83615s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:23:40 2025      Time elapsed: 43.36701        ETA: 46.92074s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:23:43 2025      Time elapsed: 46.19371        ETA: 43.97203s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:23:46 2025      Time elapsed: 49.07708        ETA: 41.08511s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:23:49 2025      Time elapsed: 51.83707        ETA: 38.10788s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:23:52 2025      Time elapsed: 54.72434        ETA: 35.23545s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:23:54 2025      Time elapsed: 57.54428        ETA: 32.32373s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:23:57 2025      Time elapsed: 60.35362        ETA: 29.41557s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:24:00 2025      Time elapsed: 63.17421        ETA: 26.52112s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:24:03 2025      Time elapsed: 66.08695        ETA: 23.66608s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:24:06 2025      Time elapsed: 68.82843        ETA: 20.75460s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:24:09 2025      Time elapsed: 71.77904        ETA: 17.90889s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:24:12 2025      Time elapsed: 74.65919        ETA: 15.04091s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:24:14 2025      Time elapsed: 77.63496        ETA: 12.18705s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:24:17 2025      Time elapsed: 80.57591        ETA: 9.32046s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:24:20 2025      Time elapsed: 83.54127        ETA: 6.45062s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:24:23 2025      Time elapsed: 86.52820        ETA: 3.57531s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:24:26 2025      Time elapsed: 89.51714        ETA: 0.69281s
+Epoch 49: Avg Policy Loss=0.1328, Avg Value Loss=0.0969
+  End: Training epoch 49                       Current time: Thu Oct  2 19:24:27 2025      Time elapsed: 90.33098s
+Begin: Validating epoch 49                     Current time: Thu Oct  2 19:24:27 2025      
+Validation: Policy Loss=0.0544, Value Loss=0.0672, Top-1 Acc=0.9757, Top-5 Acc=0.9999
+  End: Validating epoch 49                     Current time: Thu Oct  2 19:24:30 2025      Time elapsed: 2.69445s
+Checkpoint saved to /teamspace/studios/this_studio/chess_bot/results/checkpoints/dataset-1m_lr-1e-4/model_epoch_49.pt
+Begin: Training epoch 50                       Current time: Thu Oct  2 19:24:30 2025      
+Begin: Training for 3125 batches               Current time: Thu Oct  2 19:24:30 2025      
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:24:30 2025      Time elapsed: 0.21194         ETA: 662.13572s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:24:33 2025      Time elapsed: 3.18437         ETA: 95.34204s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:24:36 2025      Time elapsed: 6.12792         ETA: 89.14462s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:24:39 2025      Time elapsed: 8.97936         ETA: 84.24492s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:24:42 2025      Time elapsed: 11.86990        ETA: 80.63244s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:24:45 2025      Time elapsed: 14.78006        ETA: 77.41094s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:24:48 2025      Time elapsed: 17.70038        ETA: 74.33571s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:24:51 2025      Time elapsed: 20.62229        ETA: 71.31018s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:24:53 2025      Time elapsed: 23.51191        ETA: 68.21683s
+  Lap: Training for 3125 batches               Current time: Thu Oct  2 19:24:56 2025      Time elapsed: 26.37454        ETA: 65.10210s
+Traceback (most recent call last):
+  File "/teamspace/studios/this_studio/chess_bot/src/train_test.py", line 190, in <module>
+    train_pipeline(
+  File "/teamspace/studios/this_studio/chess_bot/src/train_test.py", line 77, in train_pipeline
+    scaler.scale(loss).backward()
+  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/torch/_tensor.py", line 648, in backward
+    torch.autograd.backward(
+  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/torch/autograd/__init__.py", line 353, in backward
+    _engine_run_backward(
+  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/torch/autograd/graph.py", line 824, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+KeyboardInterrupt

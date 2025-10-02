@@ -69,12 +69,13 @@ def board_from_ascii(ascii_board):
 
 if __name__ == "__main__":
     with torch.no_grad():
-        checkpoint_dir = r"/teamspace/studios/this_studio/chess_bot/results/checkpoints/_test_run_2/model_epoch_39.pt"
+        checkpoint_dir = r"/teamspace/studios/this_studio/chess_bot/results/checkpoints/dataset-1m_lr-1e-4/model_epoch_40.pt"
 
-        if torch.cuda.is_available():
-            device = "cuda"
-        else:
-            device = "cpu"
+        # if torch.cuda.is_available():
+        #     device = "cuda"
+        # else:
+        #     device = "cpu"
+        device = "cpu"
 
         model = ChessViT()
         model.load_state_dict(torch.load(checkpoint_dir, map_location=torch.device('cpu')))

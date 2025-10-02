@@ -6,6 +6,7 @@ from torch.amp.grad_scaler import GradScaler
 from torch.amp.autocast_mode import autocast
 import os
 import shutil
+import weightwatcher as ww
 
 from run_timer import TIMER
 from dataloader import CCRL4040LMDBDataset, worker_init_fn
@@ -40,6 +41,7 @@ def train_pipeline(
     
     model.to(device)
     optimizer = optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
+    watcher = ww.WeightWatcher(model)
     
     # Losses
     policy_loss_fn = nn.CrossEntropyLoss()
@@ -148,15 +150,16 @@ def train_pipeline(
         checkpoint_path = os.path.join(checkpoint_dir, f'model_epoch_{epoch}.pt')
         torch.save(model.state_dict(), checkpoint_path)
         print(f"Checkpoint saved to {checkpoint_path}")
+        print(watcher.analyze(plot=True))
 
 
 if __name__ == "__main__":
 
     TIMER.start("Initializing Dataloader")
     # Paths
-    lmdb_path_train = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-train-1m-50k.lmdb'
-    lmdb_path_val = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-val-1m-50k.lmdb'
-    checkpoint_path = r'/teamspace/studios/this_studio/chess_bot/results/checkpoints/dataset-1m_lr-1e-4'
+    lmdb_path_train = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-train-2m-100k.lmdb'
+    lmdb_path_val = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-val-2m-100k.lmdb'
+    checkpoint_path = r'/teamspace/studios/this_studio/chess_bot/results/checkpoints/dataset-2m_lr-1e-4'
 
     # Hyperparameters
     batch_size = 320
@@ -175,6 +178,7 @@ if __name__ == "__main__":
     TIMER.start("Initializing Model")
     
     # Initialize model
+
     model = ChessViT()
 
     # Check if cuda is available
@@ -182,7 +186,7 @@ if __name__ == "__main__":
         device = 'cuda'
     else:
         device = 'cpu'
-    print(f"Runnign on {device}")
+    print(f"Running on {device}")
 
     TIMER.stop("Initializing Model")
     
