@@ -148,21 +148,16 @@ if __name__ == "__main__":
                 if move in board.legal_moves:
                     best_move = move
                     break
-                elif from_piece != None and from_piece.piece_type == chess.PAWN:
-                    tmp_move = chess.Move.from_uci(str(move).replace("q", "").replace("r", "").replace("b", "").replace("n", ""))
-                    if tmp_move in board.legal_moves:
-                        best_move = tmp_move
-                        break
 
             if best_move is None:
                 raise ValueError("No legal move found in logits!")  # should not happen
 
-            print(f"Best move: {best_move}")
-            board.push(best_move)
-
             TIMER.stop("forward pass")
 
+            print(f"Best move: {best_move}")
             print(board)
+
+            board.push(best_move)
 
             op_move = input("Enter opponent move: ")
             board.push(chess.Move.from_uci(op_move))

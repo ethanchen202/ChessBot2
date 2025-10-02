@@ -79,32 +79,45 @@ def move_to_index(move, board):
     Map a chess.Move to AlphaZero-style index (0-4671)
     """
     def square_to_rowcol(square):
-        """Convert 0-63 square to (row, col)"""
         return divmod(square, 8)
-
-    def rowcol_to_square(row, col):
-        """Convert (row, col) to 0-63 square"""
-        return row * 8 + col
 
     from_sq = move.from_square
     to_sq = move.to_square
     from_row, from_col = square_to_rowcol(from_sq)
     to_row, to_col = square_to_rowcol(to_sq)
 
-    # Sliding pieces
     piece = board.piece_at(from_sq)
-    if piece == None:
-        return
+    if piece is None:
+        return None
 
-    if piece.piece_type in [chess.ROOK, chess.BISHOP, chess.QUEEN]:
+    # Pawn promotions (excluding queen promotions, which stay in sliding category)
+    if piece.piece_type == chess.PAWN and move.promotion and move.promotion != chess.QUEEN:
         dr = to_row - from_row
         dc = to_col - from_col
-        # Determine direction
+        # Match against PROMOTION_OFFSETS
+        for i, (direction, prom_piece) in enumerate(PROMOTION_OFFSETS):
+            if move.promotion == prom_piece:
+                if direction == "N" and dc == 0:
+                    move_type = 64 + i
+                    break
+                elif direction == "NE" and dr != 0 and dc > 0:
+                    move_type = 64 + i
+                    break
+                elif direction == "NW" and dr != 0 and dc < 0:
+                    move_type = 64 + i
+                    break
+        else:
+            raise ValueError("Invalid promotion move")
+
+    # Sliding pieces (rook, bishop, queen, king, pawn non-promotion pushes)
+    elif piece.piece_type in [chess.ROOK, chess.BISHOP, chess.QUEEN, chess.KING, chess.PAWN]:
+        dr = to_row - from_row
+        dc = to_col - from_col
         if dr == 0:  # horizontal
-            direction = 3 if dc < 0 else 2  # W or E
+            direction = 3 if dc < 0 else 2
             steps = abs(dc) - 1
         elif dc == 0:  # vertical
-            direction = 1 if dr < 0 else 0  # S or N
+            direction = 1 if dr < 0 else 0
             steps = abs(dr) - 1
         elif abs(dr) == abs(dc):  # diagonal
             if dr > 0 and dc > 0:
@@ -116,7 +129,10 @@ def move_to_index(move, board):
             else:
                 direction = 7  # SW
             steps = abs(dr) - 1
+        else:
+            raise ValueError("Invalid sliding move")
         move_type = direction * 7 + steps
+
     # Knight moves
     elif piece.piece_type == chess.KNIGHT:
         dr = to_row - from_row
@@ -125,32 +141,12 @@ def move_to_index(move, board):
             if (dr, dc) == (kdr, kdc):
                 move_type = 56 + i
                 break
-    # Pawn promotions
-    elif piece.piece_type == chess.PAWN and move.promotion:
-        for i, (_, prom_piece) in enumerate(PROMOTION_OFFSETS):
-            if move.promotion == prom_piece:
-                move_type = 64 + i
-                break
-    # Normal pawn moves (no promotion)
-    elif piece.piece_type == chess.PAWN:
-        # treat as sliding pawn forward moves (1-7 squares)
-        dr = to_row - from_row
-        if piece.color == chess.BLACK:
-            dr = -dr
-        print(64 + dr - 1)
-        move_type = 64 + dr - 1  # approximate
-    # King moves (can be treated like single-step sliding)
-    elif piece.piece_type == chess.KING:
-        dr = to_row - from_row
-        dc = to_col - from_col
-        # single step sliding
-        direction_map = {(1,0):0, (-1,0):1, (0,1):2, (0,-1):3, (1,1):4, (1,-1):5, (-1,1):6, (-1,-1):7}
-        move_type = direction_map.get((dr,dc), 0)  # simplification
+        else:
+            raise ValueError("Invalid knight move")
     else:
         raise ValueError("Unknown piece type")
 
-    index = from_sq * NUM_MOVE_TYPES + move_type
-    return index
+    return from_sq * NUM_MOVE_TYPES + move_type
 
 
 def index_to_move(index, board):
@@ -162,11 +158,10 @@ def index_to_move(index, board):
     move_type = index % NUM_MOVE_TYPES
     from_row, from_col = divmod(from_sq, 8)
 
-    # Sliding pieces (0–55: 8 directions × 7 steps)
+    # Sliding moves
     if move_type < 56:
         direction = move_type // 7
-        steps = (move_type % 7) + 1  # steps = 1..7
-        # Directions N,S,E,W,NE,NW,SE,SW
+        steps = (move_type % 7) + 1
         dir_map = {
             0: (1, 0),   # N
             1: (-1, 0),  # S
@@ -181,9 +176,12 @@ def index_to_move(index, board):
         to_row = from_row + dr * steps
         to_col = from_col + dc * steps
         to_sq = to_row * 8 + to_col
+        piece = board.piece_at(from_sq)
+        if piece and piece.piece_type == chess.PAWN and to_row in [0, 7]:
+            return chess.Move(from_sq, to_sq, promotion=chess.QUEEN)
         return chess.Move(from_sq, to_sq)
 
-    # Knight moves (56–63)
+    # Knight moves
     elif move_type < 64:
         i = move_type - 56
         dr, dc = KNIGHT_OFFSETS[i]
@@ -193,21 +191,28 @@ def index_to_move(index, board):
         return chess.Move(from_sq, to_sq)
 
     # Promotions (64+)
-    elif move_type >= 64:
+    else:
         i = move_type - 64
-        prom_piece = PROMOTION_OFFSETS[i][1]  # your PROMOTION_OFFSETS maps offsets→piece
-        # Simple assumption: pawn always moves “forward one” for promotions
+        direction, prom_piece = PROMOTION_OFFSETS[i]
         piece = board.piece_at(from_sq)
         if piece is None:
             raise ValueError("Promotion move from empty square")
+
         dr = 1 if piece.color == chess.WHITE else -1
-        to_row = from_row + dr
-        to_col = from_col
+        if direction == "N":
+            to_row = from_row + dr
+            to_col = from_col
+        elif direction == "NE":
+            to_row = from_row + dr
+            to_col = from_col + 1
+        elif direction == "NW":
+            to_row = from_row + dr
+            to_col = from_col - 1
+        else:
+            raise ValueError(f"Invalid promotion direction {direction}")
+
         to_sq = to_row * 8 + to_col
         return chess.Move(from_sq, to_sq, promotion=prom_piece)
-
-    else:
-        raise ValueError(f"Unknown move_type: {move_type}")
 
 
 def move_to_policy_vector(move, board):

@@ -31,10 +31,11 @@ def train_pipeline(
     TIMER.start("Initializing training process")
 
     if load_from_checkpoint_path is not None:
-        checkpoint = torch.load(load_from_checkpoint_path)
+        checkpoint = torch.load(load_from_checkpoint_path, map_location=device)
         model.load_state_dict(checkpoint)
 
-    shutil.rmtree(checkpoint_dir)
+    if os.path.exists(checkpoint_dir):
+        shutil.rmtree(checkpoint_dir)
     os.makedirs(checkpoint_dir, exist_ok=True)
     
     model.to(device)
@@ -153,9 +154,9 @@ if __name__ == "__main__":
 
     TIMER.start("Initializing Dataloader")
     # Paths
-    lmdb_path_train = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-train.lmdb'
-    lmdb_path_val = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-val.lmdb'
-    checkpoint_path = r'/teamspace/studios/this_studio/chess_bot/results/checkpoints/_test_run_2'
+    lmdb_path_train = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-train-1m-50k.lmdb'
+    lmdb_path_val = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-val-1m-50k.lmdb'
+    checkpoint_path = r'/teamspace/studios/this_studio/chess_bot/results/checkpoints/dataset-1m_lr-1e-4'
 
     # Hyperparameters
     batch_size = 320
@@ -166,8 +167,8 @@ if __name__ == "__main__":
     train_dataset = CCRL4040LMDBDataset(lmdb_path_train)
     val_dataset = CCRL4040LMDBDataset(lmdb_path_val)
     
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=4, worker_init_fn=worker_init_fn, persistent_workers=True)
-    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=4, worker_init_fn=worker_init_fn, persistent_workers=True)
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=4, worker_init_fn=worker_init_fn, persistent_workers=True, pin_memory=True)
+    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=4, worker_init_fn=worker_init_fn, persistent_workers=True, pin_memory=True)
     
     TIMER.stop("Initializing Dataloader")
 
@@ -181,6 +182,7 @@ if __name__ == "__main__":
         device = 'cuda'
     else:
         device = 'cpu'
+    print(f"Runnign on {device}")
 
     TIMER.stop("Initializing Model")
     
@@ -190,7 +192,7 @@ if __name__ == "__main__":
         train_loader, 
         val_loader=val_loader, 
         num_epochs=num_epochs, 
-        lr=1e-3, 
+        lr=1e-4, 
         accumulation_steps=accumulation_steps,
         device=device,
         checkpoint_dir=checkpoint_path,

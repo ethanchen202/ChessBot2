@@ -80,16 +80,37 @@ def sanity_check_input(h5_path, lmdb_path):
 
 def sanity_check_policy(pgn_path, num_games=100):
     with open(pgn_path, "r") as pgn_file:
-        for _ in range(num_games):
+        TIMER.start("Reading game")
+        correct = 0
+        total = 0
+        for game_idx in range(num_games):
             game = chess.pgn.read_game(pgn_file)
             board = game.board()                    # type: ignore
             for move in game.mainline_moves():      # type: ignore
                 piece = board.piece_at(move.from_square)
-                print(piece, end=" | ")
-                print(move, end=" | ")
-                print(move_to_index(move, board), end=" | ")
-                print(index_to_move(move_to_index(move, board), board))         
+                try:
+                    if move == index_to_move(move_to_index(move, board), board):
+                        correct += 1
+                    else:
+                        print(board)
+                        print(piece, end=" | ")
+                        print(move, end=" | ")
+                        print(move_to_index(move, board), end=" | ")
+                        print(index_to_move(move_to_index(move, board), board), end=" | ")
+                        print(move == index_to_move(move_to_index(move, board), board))
+                except ValueError:
+                    print(board)
+                    breakpoint()
+                    print(piece, end=" | ")
+                    print(move, end=" | ")
+                    print(move_to_index(move, board), end=" | ")
+                    print(index_to_move(move_to_index(move, board), board), end=" | ")
+                    print(move == index_to_move(move_to_index(move, board), board))
+                total += 1
                 board.push(move)
+            TIMER.lap("Reading game", game_idx + 1, num_games)
+        TIMER.stop("Reading game")
+        print(correct, total, correct / total)
             
 
 
@@ -99,4 +120,4 @@ if __name__ == "__main__":
     lmdb_path = r"/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040.lmdb"
     pgn_path = r"/teamspace/studios/this_studio/chess_bot/datasets/raw/CCRL-4040/CCRL-4040.[2173847].pgn"
     # sanity_check_input(h5_path, lmdb_path)
-    sanity_check_policy(pgn_path, num_games=1)
+    sanity_check_policy(pgn_path, num_games=1000)
