@@ -90,64 +90,74 @@ def mcts_search(board: chess.Board, history: deque, model, num_simulations: int 
     """
 
     root = MCTSNode(board.copy(), history=history)
-    
+
     # Add Dirichlet noise to root for exploration
-    if add_noise:
-        noise = np.random.dirichlet([0.3] * len(list(board.legal_moves)))
+    legal_moves = list(board.legal_moves)
+    if add_noise and legal_moves:
+        noise = np.random.dirichlet([0.3] * len(legal_moves))
         noise_weight = 0.25
-    
+
     for _ in range(num_simulations):
         node = root
         search_path = [node]
         current_board = board.copy()
         current_history = history.copy()
-        
-        # Selection: traverse tree until we reach a leaf
+
+        # Selection
         while node.is_expanded() and not current_board.is_game_over():
             move, node = node.select_child(c_puct)
             current_history.append(board_to_planes(current_board))
             current_board.push(move)
             search_path.append(node)
-        
-        # Check if game is over
+
+        # Check for terminal node
         if current_board.is_game_over():
             result = current_board.result()
             if result == "1-0":
-                value = 1.0 if current_board.turn == chess.BLACK else -1.0
+                value = torch.tensor(1.0 if current_board.turn == chess.BLACK else -1.0, device=device)
             elif result == "0-1":
-                value = -1.0 if current_board.turn == chess.BLACK else 1.0
+                value = torch.tensor(-1.0 if current_board.turn == chess.BLACK else 1.0, device=device)
             else:
-                value = 0.0
+                value = torch.tensor(0.0, device=device)
         else:
-            # Expansion and evaluation
+            # Encode and send to GPU
+            board_tensor = torch.as_tensor(
+                encode_board(current_board, current_history),
+                device=device,
+                dtype=torch.float32
+            ).unsqueeze(0)
+
             with torch.no_grad():
-                board_tensor = torch.as_tensor(encode_board(current_board, current_history)).unsqueeze(0)
-                model_policy, model_value = model(board_tensor)
-                value = model_value.item()
-                policy = torch.softmax(model_policy.squeeze(0), dim=0)
-            
-            # Expand node
+                policy_logits, value = model(board_tensor)
+                policy = torch.softmax(policy_logits.squeeze(0), dim=0)
+                # Keep everything on GPU, don’t call .item()
+
             move_probs = policy_to_move_probs(current_board, policy)
-            
+
+            # Expansion
             for i, (move, prob) in enumerate(move_probs.items()):
                 child_board = current_board.copy()
                 child_history = current_history.copy()
                 child_board.push(move)
-                
+
                 prior = prob
-                # Add Dirichlet noise at root
                 if node == root and add_noise:
-                    prior = (1 - noise_weight) * prior + noise_weight * noise[i]
-                
-                node.children[move] = MCTSNode(child_board, history=child_history, parent=node, prior=prior)
-        
-        # Backpropagation
+                    prior = (1 - noise_weight) * prob + noise_weight * noise[i]
+
+                node.children[move] = MCTSNode(
+                    child_board,
+                    history=child_history,
+                    parent=node,
+                    prior=prior
+                )
+
+        # Backpropagation (on GPU)
         for node in reversed(search_path):
-            node.value_sum += value if current_board.turn == chess.WHITE else -value
+            node.value_sum += value.item() if current_board.turn == chess.WHITE else -value.item()
             node.visit_count += 1
-            value = -value  # Flip for opponent
-    
-    # Return visit count distribution
+            value = -value  # flip sign for opponent
+
+    # Normalize visit counts
     visit_counts = {move: child.visit_count for move, child in root.children.items()}
     total = sum(visit_counts.values())
     return {move: count / total for move, count in visit_counts.items()}
@@ -217,6 +227,7 @@ def generate_self_play_game(model, history_length=8, temperature: float = 1.0,
         move_count += 1
 
         TIMER.lap("Generating self-play game", move_count, move_count)
+        print(board)
 
     TIMER.stop("Generating self-play game")
     TIMER.start("Processing generaged game data")
