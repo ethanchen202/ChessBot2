@@ -13,8 +13,6 @@ import numpy as np
 import chess
 
 
-import chess
-
 def board_from_ascii(ascii_board):
     """
     Converts an ASCII chessboard string to a python-chess Board object
@@ -69,7 +67,7 @@ def board_from_ascii(ascii_board):
 
 if __name__ == "__main__":
     with torch.no_grad():
-        checkpoint_dir = r"/teamspace/studios/this_studio/chess_bot/results/checkpoints/dataset-1m_lr-1e-4/model_epoch_40.pt"
+        checkpoint_dir = r"/teamspace/studios/this_studio/chess_bot/results/checkpoints/dataset-2m_lr-1e-4/model_epoch_78.pt"
 
         # if torch.cuda.is_available():
         #     device = "cuda"
@@ -139,7 +137,9 @@ if __name__ == "__main__":
 
             # Now iterate until we find a legal move
             best_move = None
+            num_iterations = 0
             for idx in sorted_indices:
+                num_iterations += 1
                 idx = idx.item()
                 
                 # Convert index to move
@@ -147,6 +147,7 @@ if __name__ == "__main__":
                 from_piece = board.piece_at(move.from_square)
 
                 if move in board.legal_moves:
+                    print(f"Best move found at iteration {num_iterations}")
                     best_move = move
                     break
 
@@ -155,10 +156,10 @@ if __name__ == "__main__":
 
             TIMER.stop("forward pass")
 
-            print(f"Best move: {best_move}")
-            print(board)
-
             board.push(best_move)
+
+            print(board)
+            print(f"Value: {value} | Best move: {best_move}")
 
             op_move = input("Enter opponent move: ")
             board.push(chess.Move.from_uci(op_move))

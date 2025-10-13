@@ -1,0 +1,5 @@
+(A) MCTS + RL
+(A) weighted gradients
+(A) learning rate scheduler
+(B) balance policy and value head loss magnitude
+(C) material inbalance pretraining

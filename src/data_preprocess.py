@@ -71,7 +71,42 @@ def board_to_planes(board):
             if piece.color == chess.BLACK:
                 idx += 6
             planes[idx, row, col] = 1
-    return planes
+    return planes if board.turn == chess.WHITE else np.flip(planes, axis=1)
+
+
+def encode_board(board, history):
+    """
+    Encode a single board into AlphaZero-style input tensors.
+    """
+    current_planes = board_to_planes(board)
+    history.append(current_planes)
+
+    # Stack history
+    stacked_planes = np.concatenate(list(history), axis=0)
+
+    # Side-to-move plane (1/-1 for white/black)
+    side_plane = np.full((1, 8, 8), (1 if board.turn == chess.WHITE else -1), dtype=np.float32)
+
+    # Castling Rights
+    castle_plane_kw = np.full((1, 8, 8), (1 if board.has_kingside_castling_rights(chess.WHITE) else 0), dtype=np.float32)
+    castle_plane_qw = np.full((1, 8, 8), (1 if board.has_queenside_castling_rights(chess.WHITE) else 0), dtype=np.float32)
+    castle_plane_kb = np.full((1, 8, 8), (1 if board.has_kingside_castling_rights(chess.BLACK) else 0), dtype=np.float32)
+    castle_plane_qb = np.full((1, 8, 8), (1 if board.has_queenside_castling_rights(chess.BLACK) else 0), dtype=np.float32)
+
+    # En Passant
+    ep_plane = np.zeros((1, 8, 8), dtype=np.float32)
+    if board.ep_square is not None:
+        x = chess.square_file(board.ep_square)
+        y = 7 - chess.square_rank(board.ep_square)
+        ep_plane[0, y, x] = 1
+        if board.turn == chess.BLACK:
+            ep_plane = np.flip(ep_plane, axis=1)
+
+    # Concat
+    input_tensor = np.concatenate([stacked_planes, side_plane, castle_plane_kw, 
+                        castle_plane_qw, castle_plane_kb, castle_plane_qb, ep_plane], axis=0)
+
+    return input_tensor
 
 
 def move_to_index(move, board):
@@ -247,36 +282,8 @@ def encode_game(game, history_length=8):
         history.append(empty_planes)
 
     for move in game.mainline_moves():
-        current_planes = board_to_planes(board)
-        history.append(current_planes)
-
-        # Stack history
-        stacked_planes = np.concatenate(list(history), axis=0)
-
-        # Side-to-move plane (1/-1 for white/black)
-        side_plane = np.full((1, 8, 8), (1 if board.turn == chess.WHITE else -1), dtype=np.float32)
-
-        # Castling Rights
-        castle_plane_kw = np.full((1, 8, 8), (1 if board.has_kingside_castling_rights(chess.WHITE) else 0), dtype=np.float32)
-        castle_plane_qw = np.full((1, 8, 8), (1 if board.has_queenside_castling_rights(chess.WHITE) else 0), dtype=np.float32)
-        castle_plane_kb = np.full((1, 8, 8), (1 if board.has_kingside_castling_rights(chess.BLACK) else 0), dtype=np.float32)
-        castle_plane_qb = np.full((1, 8, 8), (1 if board.has_queenside_castling_rights(chess.BLACK) else 0), dtype=np.float32)
-
-        # En Passant
-        ep_plane = np.zeros((1, 8, 8), dtype=np.float32)
-        if board.ep_square is not None:
-            x = chess.square_file(board.ep_square)
-            y = 7 - chess.square_rank(board.ep_square)
-            ep_plane[0, y, x] = 1
-
-        # Concat
-        input_tensor = np.concatenate([stacked_planes, side_plane, castle_plane_kw, 
-                            castle_plane_qw, castle_plane_kb, castle_plane_qb, ep_plane], axis=0)
         
-
-        # Orient board based on current player
-        if board.turn == chess.BLACK:
-            input_tensor = np.flip(input_tensor, axis=1)
+        input_tensor = encode_board(board, history)
 
         tensors.append(input_tensor)
         policies.append(move_to_policy_vector(move, board))

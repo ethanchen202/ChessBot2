@@ -7,10 +7,15 @@ from torch.amp.autocast_mode import autocast
 import os
 import shutil
 import weightwatcher as ww
+import pandas as pd
 
 from run_timer import TIMER
 from dataloader import CCRL4040LMDBDataset, worker_init_fn
 from model import ChessViT
+
+pd.set_option('display.max_rows', None)
+pd.set_option('display.max_columns', None)
+pd.set_option('display.width', 1000) # Adjust width for better column display
 
 
 # ----------------------------
