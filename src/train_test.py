@@ -175,7 +175,7 @@ if __name__ == "__main__":
     train_dataset = CCRL4040LMDBDataset(lmdb_path_train)
     val_dataset = CCRL4040LMDBDataset(lmdb_path_val)
     
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=4, worker_init_fn=worker_init_fn, persistent_workers=True, pin_memory=True)
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=False, num_workers=4, worker_init_fn=worker_init_fn, persistent_workers=True, pin_memory=True)
     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=4, worker_init_fn=worker_init_fn, persistent_workers=True, pin_memory=True)
     
     TIMER.stop("Initializing Dataloader")

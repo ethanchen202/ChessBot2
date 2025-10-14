@@ -5,8 +5,18 @@ from collections import deque
 import h5py
 import pickle
 import lmdb
+import random
 
 from run_timer import TIMER
+
+
+HISTORY_LEN = 1
+METADATA_PLANES = 7
+
+OPENING_SAMPLE_PROB = 0.2
+MIDGAME_SAMPLE_PROB = 0.8
+ENDGAME_SAMPLE_PROB = 1
+
 
 games_processed = 0
 
@@ -36,12 +46,6 @@ KNIGHT_OFFSETS = [
 ]
 
 # Pawn promotions: straight, capture left, capture right
-# PROMOTION_OFFSETS = [
-#     ("N", None), ("NE", chess.QUEEN), ("NW", chess.QUEEN),
-#     ("NE", chess.ROOK), ("NW", chess.ROOK),
-#     ("NE", chess.BISHOP), ("NW", chess.BISHOP),
-#     ("NE", chess.KNIGHT), ("NW", chess.KNIGHT)
-# ]
 PROMOTION_OFFSETS = [
     ("N", chess.ROOK), ("NE", chess.ROOK), ("NW", chess.ROOK),
     ("N", chess.KNIGHT), ("NE", chess.KNIGHT), ("NW", chess.KNIGHT),
@@ -102,9 +106,12 @@ def encode_board(board, history):
         if board.turn == chess.BLACK:
             ep_plane = np.flip(ep_plane, axis=1)
 
+    # 50-Move Rule
+    halfmove_plane = np.full((1, 8, 8), board.halfmove_clock / 99.0, dtype=np.float32)
+
     # Concat
     input_tensor = np.concatenate([stacked_planes, side_plane, castle_plane_kw, 
-                        castle_plane_qw, castle_plane_kb, castle_plane_qb, ep_plane], axis=0)
+                        castle_plane_qw, castle_plane_kb, castle_plane_qb, ep_plane, halfmove_plane], axis=0)
 
     return input_tensor
 
@@ -275,6 +282,7 @@ def encode_game(game, history_length=8):
     tensors = []
     policies = []
     values = []
+    mv_count = 0
 
     # Fill initial history with empty boards
     empty_planes = np.zeros((12, 8, 8), dtype=np.float32)
@@ -282,13 +290,25 @@ def encode_game(game, history_length=8):
         history.append(empty_planes)
 
     for move in game.mainline_moves():
+
+        mv_count += 1
         
         input_tensor = encode_board(board, history)
+        board.push(move)
+
+        if mv_count < 15:
+            if random.random() > OPENING_SAMPLE_PROB:
+                continue
+        elif mv_count < 40:
+            if random.random() > MIDGAME_SAMPLE_PROB:
+                continue
+        else:
+            if random.random() > ENDGAME_SAMPLE_PROB:
+                continue
 
         tensors.append(input_tensor)
         policies.append(move_to_policy_vector(move, board))
         values.append(result)
-        board.push(move)
 
     return np.array(tensors), np.array(policies), np.array(values)
 
@@ -336,7 +356,7 @@ def store_h5py(pgn_path, h5py_path, num_games=2173847, max_samples=1000, history
     with h5py.File(h5py_path, "w") as f:
 
         TIMER.start("Creating datasets")
-        dset_x = f.create_dataset("features", shape=(max_samples, 18, 8, 8), dtype="float32", chunks=None, compression=None)
+        dset_x = f.create_dataset("features", shape=(max_samples, (12*history_length + METADATA_PLANES), 8, 8), dtype="float32", chunks=None, compression=None)
         dset_p = f.create_dataset("policies", shape=(max_samples, 4672), dtype="float32", chunks=None, compression=None)
         dset_v = f.create_dataset("values", shape=(max_samples,), dtype="float32", chunks=None, compression=None)
         TIMER.stop("Creating datasets")
@@ -376,7 +396,7 @@ def store_lmdb(pgn_path, lmdb_path, num_games=2173847, max_samples=1000, history
     """
     TIMER.start("Creating LMDB")
     # Estimate map_size: very rough estimate (e.g., 1 GB per 100k samples)
-    map_size = max_samples * (18*8*8 + 4672 + 1) * 4 * 10  # float32, times 2 safety factor
+    map_size = max_samples * ((12*history_length + METADATA_PLANES)*8*8 + 4672 + 1) * 4 * 10  # float32, times 10 safety factor
 
     env = lmdb.open(lmdb_path, map_size=map_size)
 
@@ -415,10 +435,12 @@ def store_lmdb(pgn_path, lmdb_path, num_games=2173847, max_samples=1000, history
 
 
 if __name__ == "__main__":
+    random.seed(2025)
+
     data_path = r'/teamspace/studios/this_studio/chess_bot/datasets/raw/CCRL-4040/CCRL-4040.[2173847].pgn'
-    h5py_path = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040.h5'
-    lmdb_path_train = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-train-2m-100k.lmdb'
-    lmdb_path_val = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-val-2m-100k.lmdb'
+    # h5py_path = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040.h5'
+    lmdb_path_train = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-train-2m-100k-0.2-0.8-1.lmdb'
+    lmdb_path_val = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-val-2m-100k-0.2-0.8-1.lmdb'
 
     store_lmdb(pgn_path=data_path, lmdb_path=lmdb_path_train, max_samples=2000000, history_length=1, chunk_size=5)
     store_lmdb(pgn_path=data_path, lmdb_path=lmdb_path_val, max_samples=100000, history_length=1, chunk_size=5)

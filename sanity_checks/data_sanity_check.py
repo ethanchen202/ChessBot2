@@ -2,9 +2,9 @@ import sys
 
 sys.path.append("/teamspace/studios/this_studio/chess_bot/src")
 
-from data_preprocess import move_to_index, index_to_move    # type: ignore
-from dataloader import CCRL4040LMDBDataset, worker_init_fn  # type: ignore
-from run_timer import TIMER                                 # type: ignore
+from data_preprocess import move_to_index, index_to_move, encode_board      # type: ignore
+from dataloader import CCRL4040LMDBDataset, worker_init_fn                  # type: ignore
+from run_timer import TIMER                                                 # type: ignore
 from torch.utils.data import DataLoader
 import numpy as np
 import chess
@@ -37,6 +37,21 @@ index_to_piece = {
 }
 
 def print_board(tensor):
+    board_str = ""
+    for rank in range(8):  # ranks 0..7
+        row_str = ""
+        for file in range(8):  # files 0..7
+            piece_symbol = "."
+            for plane in range(12):
+                if tensor[plane, rank, file] == 1:
+                    piece_symbol = index_to_piece[plane]
+                    break
+            row_str += piece_symbol + " "
+        board_str += row_str + "\n"
+    print(board_str)
+
+
+def decode_board_tensor(tensor):
     board_str = ""
     for rank in range(8):  # ranks 0..7
         row_str = ""
@@ -117,7 +132,7 @@ def sanity_check_policy(pgn_path, num_games=100):
 
 if __name__ == "__main__":
     h5_path = r"/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040.h5"
-    lmdb_path = r"/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040.lmdb"
+    lmdb_path = r"/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-train-1m-50k-legacy.lmdb"
     pgn_path = r"/teamspace/studios/this_studio/chess_bot/datasets/raw/CCRL-4040/CCRL-4040.[2173847].pgn"
     # sanity_check_input(h5_path, lmdb_path)
     sanity_check_policy(pgn_path, num_games=1000)
