@@ -3,11 +3,12 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from run_timer import TIMER
+from data_preprocess import HISTORY_LEN, METADATA_PLANES
 
 
 class ChessViT(nn.Module):
     def __init__(self, 
-                 in_channels=18, 
+                 in_channels=(HISTORY_LEN*12 + METADATA_PLANES), 
                  img_size=8, 
                  patch_size=1, 
                  embed_dim=128, 
@@ -105,7 +106,7 @@ class ChessViT(nn.Module):
 
 if __name__ == "__main__":
     model = ChessViT()
-    x = torch.randn(64, 18, 8, 8)
+    x = torch.randn(64, HISTORY_LEN*12 + METADATA_PLANES, 8, 8)
     TIMER.start("forward pass")
     policy_logits, value = model(x)
     TIMER.stop("forward pass")

@@ -7,6 +7,8 @@ import pickle
 import lmdb
 import random
 
+from numpy.random import shuffle
+
 from run_timer import TIMER
 
 
@@ -294,6 +296,7 @@ def encode_game(game, history_length=8):
         mv_count += 1
         
         input_tensor = encode_board(board, history)
+        policy = move_to_policy_vector(move, board)
         board.push(move)
 
         if mv_count < 15:
@@ -307,7 +310,7 @@ def encode_game(game, history_length=8):
                 continue
 
         tensors.append(input_tensor)
-        policies.append(move_to_policy_vector(move, board))
+        policies.append(policy)
         values.append(result)
 
     return np.array(tensors), np.array(policies), np.array(values)
@@ -389,7 +392,7 @@ def store_h5py(pgn_path, h5py_path, num_games=2173847, max_samples=1000, history
 
 
 
-def store_lmdb(pgn_path, lmdb_path, num_games=2173847, max_samples=1000, history_length=1, chunk_size=50):
+def store_lmdb(pgn_path, lmdb_path, num_games=2173847, max_samples=1000, history_length=1, chunk_size=50, shuffle=True):
     """
     Preprocesses the PGN dataset and stores it in LMDB format.
     Each sample is serialized with pickle and stored individually.
@@ -406,6 +409,13 @@ def store_lmdb(pgn_path, lmdb_path, num_games=2173847, max_samples=1000, history
     
     with env.begin(write=True) as txn:
         for tensor, policy, value in encode_pgn_file(pgn_path, history_length, num_games, chunk_size):
+            if shuffle:
+                indices = np.random.permutation(tensor.shape[0])
+
+                tensor = tensor[indices]
+                policy = policy[indices]
+                value = value[indices]
+
             for i in range(tensor.shape[0]):
                 if current_size >= max_samples:
                     break
@@ -439,8 +449,8 @@ if __name__ == "__main__":
 
     data_path = r'/teamspace/studios/this_studio/chess_bot/datasets/raw/CCRL-4040/CCRL-4040.[2173847].pgn'
     # h5py_path = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040.h5'
-    lmdb_path_train = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-train-2m-100k-0.2-0.8-1.lmdb'
-    lmdb_path_val = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-val-2m-100k-0.2-0.8-1.lmdb'
+    lmdb_path_train = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-train-1k-100-0.2-0.8-1.lmdb'
+    lmdb_path_val = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-val-1k-100-0.2-0.8-1.lmdb'
 
-    store_lmdb(pgn_path=data_path, lmdb_path=lmdb_path_train, max_samples=2000000, history_length=1, chunk_size=5)
-    store_lmdb(pgn_path=data_path, lmdb_path=lmdb_path_val, max_samples=100000, history_length=1, chunk_size=5)
+    store_lmdb(pgn_path=data_path, lmdb_path=lmdb_path_train, max_samples=1000, history_length=1, chunk_size=20, shuffle=False)
+    store_lmdb(pgn_path=data_path, lmdb_path=lmdb_path_val, max_samples=100, history_length=1, chunk_size=20, shuffle=False)
