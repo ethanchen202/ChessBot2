@@ -46,7 +46,7 @@ def train_pipeline(
     
     model.to(device)
     optimizer = optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
-    watcher = ww.WeightWatcher(model)
+    # watcher = ww.WeightWatcher(model)
     
     # Losses
     policy_loss_fn = nn.CrossEntropyLoss()
@@ -67,6 +67,8 @@ def train_pipeline(
         
         TIMER.start(f"Training for {len(train_loader)} batches")
         for step, (x, policy_labels, value_labels) in enumerate(train_loader):
+
+            breakpoint()
 
             x = x.to(device)
             policy_labels = policy_labels.to(device)
@@ -155,7 +157,7 @@ def train_pipeline(
         checkpoint_path = os.path.join(checkpoint_dir, f'model_epoch_{epoch}.pt')
         torch.save(model.state_dict(), checkpoint_path)
         print(f"Checkpoint saved to {checkpoint_path}")
-        print(watcher.analyze(plot=True))
+        # print(watcher.analyze(plot=True))
 
 
 if __name__ == "__main__":
@@ -164,14 +166,15 @@ if __name__ == "__main__":
     # Paths
     # lmdb_path_train = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-train-2m-100k-0.2-0.8-1.lmdb'
     # lmdb_path_val = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-val-2m-100k-0.2-0.8-1.lmdb'
-    lmdb_path_train = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-train-1k-100-1-1-1.lmdb'
-    lmdb_path_val = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-val-1k-100-1-1-1.lmdb'
-    checkpoint_path = r'/teamspace/studios/this_studio/chess_bot/results/checkpoints/dataset-1k-1-1-1_lr-1e-4'
+    lmdb_path_train = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-train-1k-100-0.2-0.8-1.lmdb'
+    lmdb_path_val = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-val-1k-100-0.2-0.8-1.lmdb'
+    checkpoint_path = r'/teamspace/studios/this_studio/chess_bot/results/checkpoints/dataset-1k-100-0.2-0.8-1_lr-1e-3'
 
     # Hyperparameters
-    batch_size = 320
+    batch_size = 32
     accumulation_steps = 1  # effective batch size = batch_size * accumulation_steps
     num_epochs = 200
+    lr = 1e-3
     
     # Create datasets
     train_dataset = CCRL4040LMDBDataset(lmdb_path_train)
@@ -203,7 +206,7 @@ if __name__ == "__main__":
         train_loader, 
         val_loader=val_loader, 
         num_epochs=num_epochs, 
-        lr=1e-4, 
+        lr=lr, 
         accumulation_steps=accumulation_steps,
         device=device,
         checkpoint_dir=checkpoint_path,

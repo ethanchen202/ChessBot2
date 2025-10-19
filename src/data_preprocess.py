@@ -452,5 +452,5 @@ if __name__ == "__main__":
     lmdb_path_train = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-train-1k-100-0.2-0.8-1.lmdb'
     lmdb_path_val = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-val-1k-100-0.2-0.8-1.lmdb'
 
-    store_lmdb(pgn_path=data_path, lmdb_path=lmdb_path_train, max_samples=1000, history_length=1, chunk_size=20, shuffle=False)
+    store_lmdb(pgn_path=data_path, lmdb_path=lmdb_path_train, max_samples=1_000, history_length=1, chunk_size=20, shuffle=False)
     store_lmdb(pgn_path=data_path, lmdb_path=lmdb_path_val, max_samples=100, history_length=1, chunk_size=20, shuffle=False)

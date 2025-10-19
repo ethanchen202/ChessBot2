@@ -1,142 +1,24 @@
-Begin: Initializing Dataloader                 Current time: Tue Oct 14 23:48:07 2025      
-  End: Initializing Dataloader                 Current time: Tue Oct 14 23:48:07 2025      Time elapsed: 0.00243s
-Begin: Initializing Model                      Current time: Tue Oct 14 23:48:07 2025      
+Begin: Initializing Dataloader                 Current time: Thu Oct 16 19:22:35 2025      
+  End: Initializing Dataloader                 Current time: Thu Oct 16 19:22:35 2025      Time elapsed: 0.00064s
+Begin: Initializing Model                      Current time: Thu Oct 16 19:22:35 2025      
 Running on cuda
-  End: Initializing Model                      Current time: Tue Oct 14 23:48:07 2025      Time elapsed: 0.04174s
-Begin: Initializing training process           Current time: Tue Oct 14 23:48:07 2025      
-  End: Initializing training process           Current time: Tue Oct 14 23:48:08 2025      Time elapsed: 1.57600s
-Begin: Training epoch 1                        Current time: Tue Oct 14 23:48:08 2025      
-Begin: Training for 4 batches                  Current time: Tue Oct 14 23:48:08 2025      
-  Lap: Training for 4 batches                  Current time: Tue Oct 14 23:48:09 2025      Time elapsed: 0.80070         ETA: 2.40218s
-Epoch 1: Avg Policy Loss=39592.9561, Avg Value Loss=0.7281
-  End: Training epoch 1                        Current time: Tue Oct 14 23:48:09 2025      Time elapsed: 0.87924s
-Begin: Validating epoch 1                      Current time: Tue Oct 14 23:48:09 2025      
-Validation: Policy Loss=39592.6406, Value Loss=0.7242, Top-1 Acc=0.0000, Top-5 Acc=0.0000
-  End: Validating epoch 1                      Current time: Tue Oct 14 23:48:10 2025      Time elapsed: 0.21139s
-Checkpoint saved to /teamspace/studios/this_studio/chess_bot/results/checkpoints/dataset-1k-1-1-1_lr-1e-4/model_epoch_1.pt
-Traceback (most recent call last):
-  File "/teamspace/studios/this_studio/chess_bot/src/train_test.py", line 201, in <module>
+  End: Initializing Model                      Current time: Thu Oct 16 19:22:35 2025      Time elapsed: 0.03587s
+Begin: Initializing training process           Current time: Thu Oct 16 19:22:35 2025      
+  End: Initializing training process           Current time: Thu Oct 16 19:22:37 2025      Time elapsed: 1.64170s
+Begin: Training epoch 1                        Current time: Thu Oct 16 19:22:37 2025      
+Begin: Training for 32 batches                 Current time: Thu Oct 16 19:22:37 2025      
+> /teamspace/studios/this_studio/chess_bot/src/train_test.py(73)train_pipeline()
+-> x = x.to(device)
+(Pdb) --KeyboardInterrupt--
+(Pdb) Traceback (most recent call last):
+  File "/teamspace/studios/this_studio/chess_bot/src/train_test.py", line 204, in <module>
     train_pipeline(
-  File "/teamspace/studios/this_studio/chess_bot/src/train_test.py", line 158, in train_pipeline
-    print(watcher.analyze(plot=True))
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/weightwatcher/weightwatcher.py", line 3595, in analyze
-    self.apply_powerlaw(ww_layer, params)
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/weightwatcher/weightwatcher.py", line 3152, in apply_powerlaw
-    self.fit_powerlaw(evals, xmin=xmin, xmax=xmax, plot=plot, layer_name=layer_name, layer_id=layer_id, \
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/weightwatcher/weightwatcher.py", line 4389, in fit_powerlaw
-    save_fig(plt, "esd4", plot_id, savedir)
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/weightwatcher/RMT_Util.py", line 924, in save_fig
-    plt.tight_layout()
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/matplotlib/pyplot.py", line 2584, in tight_layout
-    gcf().tight_layout(pad=pad, h_pad=h_pad, w_pad=w_pad, rect=rect)
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/matplotlib/figure.py", line 3540, in tight_layout
-    engine.execute(self)
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/matplotlib/layout_engine.py", line 183, in execute
-    kwargs = get_tight_layout_figure(
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/matplotlib/_tight_layout.py", line 266, in get_tight_layout_figure
-    kwargs = _auto_adjust_subplotpars(fig, renderer,
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/matplotlib/_tight_layout.py", line 82, in _auto_adjust_subplotpars
-    bb += [martist._get_tightbbox_for_layout_only(ax, renderer)]
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/matplotlib/artist.py", line 1411, in _get_tightbbox_for_layout_only
-    return obj.get_tightbbox(*args, **{**kwargs, "for_layout_only": True})
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/matplotlib/_api/deprecation.py", line 454, in wrapper
-    return func(*args, **kwargs)
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/matplotlib/axes/_base.py", line 4398, in get_tightbbox
-    self._update_title_position(renderer)
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/matplotlib/axes/_base.py", line 2988, in _update_title_position
-    if title.get_window_extent(renderer).ymin < top:
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/matplotlib/text.py", line 956, in get_window_extent
-    bbox, info, descent = self._get_layout(self._renderer)
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/matplotlib/text.py", line 381, in _get_layout
-    w, h, d = _get_text_metrics_with_cache(
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/matplotlib/text.py", line 69, in _get_text_metrics_with_cache
-    return _get_text_metrics_with_cache_impl(
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/matplotlib/text.py", line 77, in _get_text_metrics_with_cache_impl
-    return renderer_ref().get_text_width_height_descent(text, fontprop, ismath)
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/matplotlib/backends/backend_agg.py", line 217, in get_text_width_height_descent
-    self.mathtext_parser.parse(s, self.dpi, prop)
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/matplotlib/mathtext.py", line 79, in parse
-    return self._parse_cached(s, dpi, prop, antialiased)
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/matplotlib/mathtext.py", line 100, in _parse_cached
-    box = self._parser.parse(s, fontset, fontsize, dpi)
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/matplotlib/_mathtext.py", line 2162, in parse
-    result = self._expression.parseString(s)
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/pyparsing/util.py", line 436, in _inner
-    return fn(self, *args, **kwargs)
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/pyparsing/core.py", line 1306, in parse_string
-    loc, tokens = self._parse(instring, 0)
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/pyparsing/core.py", line 1071, in _parseCache
-    value = self._parseNoCache(instring, loc, do_actions, callPreParse)
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/pyparsing/core.py", line 933, in _parseNoCache
-    loc, tokens = self.parseImpl(instring, pre_loc, do_actions)
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/pyparsing/core.py", line 4515, in parseImpl
-    loc, exprtokens = e._parse(instring, loc, do_actions)
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/pyparsing/core.py", line 1071, in _parseCache
-    value = self._parseNoCache(instring, loc, do_actions, callPreParse)
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/pyparsing/core.py", line 933, in _parseNoCache
-    loc, tokens = self.parseImpl(instring, pre_loc, do_actions)
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/pyparsing/core.py", line 5595, in parseImpl
-    return super().parseImpl(instring, loc, do_actions)
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/pyparsing/core.py", line 5491, in parseImpl
-    loc, tmptokens = self_expr_parse(instring, preloc, do_actions)
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/pyparsing/core.py", line 1071, in _parseCache
-    value = self._parseNoCache(instring, loc, do_actions, callPreParse)
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/pyparsing/core.py", line 933, in _parseNoCache
-    loc, tokens = self.parseImpl(instring, pre_loc, do_actions)
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/pyparsing/core.py", line 4493, in parseImpl
-    loc, resultlist = self.exprs[0]._parse(
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/pyparsing/core.py", line 1071, in _parseCache
-    value = self._parseNoCache(instring, loc, do_actions, callPreParse)
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/pyparsing/core.py", line 972, in _parseNoCache
-    tokens = fn(instring, tokens_start, ret_tokens)  # type: ignore [call-arg, arg-type]
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/pyparsing/core.py", line 280, in wrapper
-    return func(*args[limit:])
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/matplotlib/_mathtext.py", line 2189, in math_string
-    return self._math_expression.parseString(toks[0][1:-1], parseAll=True)
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/pyparsing/util.py", line 436, in _inner
-    return fn(self, *args, **kwargs)
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/pyparsing/core.py", line 1306, in parse_string
-    loc, tokens = self._parse(instring, 0)
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/pyparsing/core.py", line 1071, in _parseCache
-    value = self._parseNoCache(instring, loc, do_actions, callPreParse)
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/pyparsing/core.py", line 933, in _parseNoCache
-    loc, tokens = self.parseImpl(instring, pre_loc, do_actions)
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/pyparsing/core.py", line 5481, in parseImpl
-    loc, tokens = self_expr_parse(instring, loc, do_actions)
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/pyparsing/core.py", line 1071, in _parseCache
-    value = self._parseNoCache(instring, loc, do_actions, callPreParse)
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/pyparsing/core.py", line 933, in _parseNoCache
-    loc, tokens = self.parseImpl(instring, pre_loc, do_actions)
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/pyparsing/core.py", line 6053, in parseImpl
-    return super().parseImpl(instring, loc, do_actions)
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/pyparsing/core.py", line 5036, in parseImpl
-    return self.expr._parse(instring, loc, do_actions, callPreParse=False)
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/pyparsing/core.py", line 1071, in _parseCache
-    value = self._parseNoCache(instring, loc, do_actions, callPreParse)
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/pyparsing/core.py", line 933, in _parseNoCache
-    loc, tokens = self.parseImpl(instring, pre_loc, do_actions)
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/pyparsing/core.py", line 4755, in parseImpl
-    return e._parse(instring, loc, do_actions)
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/pyparsing/core.py", line 1071, in _parseCache
-    value = self._parseNoCache(instring, loc, do_actions, callPreParse)
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/pyparsing/core.py", line 933, in _parseNoCache
-    loc, tokens = self.parseImpl(instring, pre_loc, do_actions)
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/pyparsing/core.py", line 4755, in parseImpl
-    return e._parse(instring, loc, do_actions)
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/pyparsing/core.py", line 1071, in _parseCache
-    value = self._parseNoCache(instring, loc, do_actions, callPreParse)
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/pyparsing/core.py", line 933, in _parseNoCache
-    loc, tokens = self.parseImpl(instring, pre_loc, do_actions)
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/pyparsing/core.py", line 4515, in parseImpl
-    loc, exprtokens = e._parse(instring, loc, do_actions)
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/pyparsing/core.py", line 1071, in _parseCache
-    value = self._parseNoCache(instring, loc, do_actions, callPreParse)
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/pyparsing/core.py", line 933, in _parseNoCache
-    loc, tokens = self.parseImpl(instring, pre_loc, do_actions)
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/pyparsing/core.py", line 5481, in parseImpl
-    loc, tokens = self_expr_parse(instring, loc, do_actions)
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/pyparsing/core.py", line 1077, in _parseCache
-    cache.set(lookup, (value[0], value[1].copy(), loc))
-  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/site-packages/pyparsing/results.py", line 663, in copy
-    def copy(self) -> ParseResults:
-KeyboardInterrupt
+  File "/teamspace/studios/this_studio/chess_bot/src/train_test.py", line 73, in train_pipeline
+    x = x.to(device)
+  File "/teamspace/studios/this_studio/chess_bot/src/train_test.py", line 73, in train_pipeline
+    x = x.to(device)
+  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/bdb.py", line 90, in trace_dispatch
+    return self.dispatch_line(frame)
+  File "/home/zeus/miniconda3/envs/cloudspace/lib/python3.10/bdb.py", line 115, in dispatch_line
+    if self.quitting: raise BdbQuit
+bdb.BdbQuit
