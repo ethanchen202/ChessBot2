@@ -1,3 +1,4 @@
+import decimal
 import chess
 import chess.pgn
 import numpy as np
@@ -6,6 +7,7 @@ import h5py
 import pickle
 import lmdb
 import random
+import os
 
 from numpy.random import shuffle
 
@@ -14,6 +16,7 @@ from run_timer import TIMER
 
 HISTORY_LEN = 1
 METADATA_PLANES = 7
+TOTAL_PLANES = HISTORY_LEN * 12 + METADATA_PLANES
 
 OPENING_SAMPLE_PROB = 0.2
 MIDGAME_SAMPLE_PROB = 0.8
@@ -272,6 +275,73 @@ def policy_vector_to_move(tensor, board):
     return move
 
 
+def encode_input_tensor(input_tensor):
+    if input_tensor.shape != (TOTAL_PLANES, 8, 8):
+        raise ValueError("Input tensor must have shape (19,8,8)")
+
+    # board planes
+    binary_planes = input_tensor[:(HISTORY_LEN * 12)].astype(np.uint64)  # ensure 0/1
+    binary_packed = (binary_planes.reshape((HISTORY_LEN * 12), 64) * (1 << np.arange(64, dtype=np.uint64))).sum(axis=1)  # shape (12*hl,)
+
+    # metadata planes
+    metadata_planes = input_tensor[(HISTORY_LEN * 12):(HISTORY_LEN * 12 + 5)]
+    metadata_values = metadata_planes[:, 0, 0].astype(np.int8)  # shape (5,)
+
+    # enpassant plane
+    enpassant_plane = input_tensor[(HISTORY_LEN * 12 + 5)]
+    enpassant_values = np.packbits(enpassant_plane.astype(np.uint8)) #  shape (1,)
+
+    # halfmove plane
+    halfmove_plane = input_tensor[(HISTORY_LEN * 12 + 6)]
+    halfmove_values = halfmove_plane[0, 0].astype(np.float32) #  shape (1,)
+
+    return binary_packed, metadata_values, enpassant_values, halfmove_values
+
+
+def decode_input_tensor(binary_packed, metadata_values, enpassant_values, halfmove_values):
+    input_tensor = np.zeros((TOTAL_PLANES, 8, 8), dtype=np.float32)
+
+    # board planes
+    mask = (1 << np.arange(64, dtype=np.uint64))
+    input_tensor[:(HISTORY_LEN * 12)] = ((binary_packed[:, None] & mask) != 0).astype(np.float32).reshape(12, 8, 8)
+
+    # metadata planes
+    input_tensor[(HISTORY_LEN * 12):(HISTORY_LEN * 12 + 5)] = metadata_values.reshape(5, 1, 1).astype(np.float32)
+
+    # enpassant
+    input_tensor[(HISTORY_LEN * 12 + 5)] = np.unpackbits(np.frombuffer(enpassant_values, dtype=np.uint8))[:64].reshape(8, 8).astype(np.float32)
+
+    # halfmove planes
+    input_tensor[(HISTORY_LEN * 12 + 6)] = halfmove_values.reshape(1, 1, 1).astype(np.float32)
+
+    return input_tensor
+
+
+# def decode_input_tensor(binary_packed, metadata_values, enpassant_values, halfmove_values):
+#     # --- reconstruct binary planes ---
+#     # binary_packed is shape (12 * HISTORY_LEN,)
+#     # Each entry represents a 64-bit board mask.
+#     bit_array = ((binary_packed[:, None] >> np.arange(64, dtype=np.uint64)) & 1).astype(np.float32)
+#     binary_planes = bit_array.reshape(-1, 8, 8)
+
+#     # --- reconstruct metadata planes ---
+#     metadata_planes = np.zeros((5, 8, 8), dtype=np.float32)
+#     for i in range(5):
+#         metadata_planes[i, 0, 0] = metadata_values[i]
+
+#     # --- reconstruct en passant plane ---
+#     enpassant_bits = np.unpackbits(enpassant_values, count=64).astype(np.float32)
+#     enpassant_plane = enpassant_bits.reshape(1, 8, 8)
+
+#     # --- reconstruct halfmove plane ---
+#     halfmove_plane = np.zeros((1, 8, 8), dtype=np.float32)
+#     halfmove_plane[0, 0, 0] = halfmove_values
+
+#     # --- concatenate all together ---
+#     reconstructed = np.concatenate([binary_planes, metadata_planes, enpassant_plane, halfmove_plane], axis=0)
+#     return reconstructed
+
+
 def encode_game(game, history_length=8):
     """
     Encode a single chess game into AlphaZero-style input tensors.
@@ -281,9 +351,12 @@ def encode_game(game, history_length=8):
     board = game.board()
     history = deque(maxlen=history_length)
     result = VALUE_MAP[game.headers['Result']]
-    tensors = []
-    policies = []
-    values = []
+    board_arrays = [] # (num_samples, history_length * 12) => history_length * 12 uint64 bitmaps for 12x8x8 board tensor
+    metadata_arrays = [] # (num_samples, 5) => 5 int8 bitmaps for metadata tensor
+    enpassant_arrays = [] # (num_samples,) => 1 uint8 bitmap for enpassant tensor
+    num_halfmoves = [] # (num_samples,) => 1 float32 for side to move
+    policy_idxs = [] # (num_samples,) => 1 uint16 for policy idx
+    values = [] # (num_samples,) => 1 int8 value
     mv_count = 0
 
     # Fill initial history with empty boards
@@ -296,7 +369,7 @@ def encode_game(game, history_length=8):
         mv_count += 1
         
         input_tensor = encode_board(board, history)
-        policy = move_to_policy_vector(move, board)
+        policy = move_to_index(move, board)
         board.push(move)
 
         if mv_count < 15:
@@ -309,11 +382,24 @@ def encode_game(game, history_length=8):
             if random.random() > ENDGAME_SAMPLE_PROB:
                 continue
 
-        tensors.append(input_tensor)
-        policies.append(policy)
+        board_planes, metadata, enpassant, halfmoves = encode_input_tensor(input_tensor)
+        board_arrays.append(board_planes)
+        metadata_arrays.append(metadata)
+        enpassant_arrays.append(enpassant)
+        num_halfmoves.append(halfmoves)
+        policy_idxs.append(policy)
         values.append(result)
+        if not np.array_equal(decode_input_tensor(board_planes, metadata, enpassant, halfmoves), input_tensor):
+            print("Encoding failed")
+            decoded = decode_input_tensor(board_planes, metadata, enpassant, halfmoves)
+            diff_mask = decoded != input_tensor
+            indices = np.argwhere(diff_mask)
+            indices = [tuple(idx) for idx in indices]
+            breakpoint()
+            raise ValueError(f"Encoding failed at indices {indices}")
 
-    return np.array(tensors), np.array(policies), np.array(values)
+    return np.array(board_arrays, dtype=np.uint64), np.array(metadata_arrays, dtype=np.int8), np.array(enpassant_arrays, dtype=np.uint8), \
+        np.array(num_halfmoves, dtype=np.float32),  np.array(policy_idxs, dtype=np.uint16), np.array(values, dtype=np.int8)
 
 
 def encode_pgn_file(pgn_path, history_length=8, num_games=1000, chunk_size=100):
@@ -336,60 +422,28 @@ def encode_pgn_file(pgn_path, history_length=8, num_games=1000, chunk_size=100):
             game = chess.pgn.read_game(pgn_file)
         TIMER.stop("Skipping already encoded games")
         for chunk in range(num_games // chunk_size):
-            all_games_tensors = []
+            all_board_tensors = []
+            all_metadata_tensors = []
+            all_enpassant_tensors = []
+            all_halfmoves_tensors = []
             all_policy_tensors = []
             all_value_tensors = []
+            
             for _ in range(chunk_size):
                 if game is None:
                     break
-                game_tensors, policy_tensors, value_tensors = encode_game(game, history_length=history_length)
-                all_games_tensors.append(game_tensors)
+                board_tensors, metadata_tensors, enpassant_tensors, halfmove_tensors, policy_tensors, value_tensors = encode_game(game, history_length=history_length)
+                all_board_tensors.append(board_tensors)
+                all_metadata_tensors.append(metadata_tensors)
+                all_enpassant_tensors.append(enpassant_tensors)
+                all_halfmoves_tensors.append(halfmove_tensors)
                 all_policy_tensors.append(policy_tensors)
                 all_value_tensors.append(value_tensors)
                 game = chess.pgn.read_game(pgn_file)
 
             games_processed += 1
-            yield np.concatenate(all_games_tensors, axis=0), np.concatenate(all_policy_tensors, axis=0), np.concatenate(all_value_tensors, axis=0)
-
-
-def store_h5py(pgn_path, h5py_path, num_games=2173847, max_samples=1000, history_length=1, chunk_size=50):
-    """
-    Preprocesses the given pgn dataset and stores it in h5 format.
-    """
-    with h5py.File(h5py_path, "w") as f:
-
-        TIMER.start("Creating datasets")
-        dset_x = f.create_dataset("features", shape=(max_samples, (12*history_length + METADATA_PLANES), 8, 8), dtype="float32", chunks=None, compression=None)
-        dset_p = f.create_dataset("policies", shape=(max_samples, 4672), dtype="float32", chunks=None, compression=None)
-        dset_v = f.create_dataset("values", shape=(max_samples,), dtype="float32", chunks=None, compression=None)
-        TIMER.stop("Creating datasets")
-        
-        current_size = 0
-        TIMER.start(f"Data sample {current_size}/{max_samples}")
-        for tensor, policy, value in encode_pgn_file(pgn_path, history_length, num_games, chunk_size):
-
-            TIMER.stop(f"Data sample {current_size}/{max_samples}")
-            old_size = current_size
-            new_size = old_size + tensor.shape[0]
-            TIMER.start(f"Data sample {new_size}/{max_samples}")
-
-            if new_size > max_samples:
-                new_size = max_samples
-                tensor = tensor[:(new_size - old_size)]
-                policy = policy[:(new_size - old_size)]
-                value = value[:(new_size - old_size)]
-            
-            dset_x[old_size:new_size] = tensor
-            dset_p[old_size:new_size] = policy
-            dset_v[old_size:new_size] = value
-
-            current_size = new_size
-            if current_size >= max_samples:
-                break
-
-        f.attrs["num_samples"] = current_size
-        f.attrs["history_length"] = history_length
-
+            yield np.concatenate(all_board_tensors, axis=0), np.concatenate(all_metadata_tensors, axis=0), np.concatenate(all_enpassant_tensors, axis=0), \
+                np.concatenate(all_halfmoves_tensors, axis=0), np.concatenate(all_policy_tensors, axis=0), np.concatenate(all_value_tensors, axis=0)
 
 
 def store_lmdb(pgn_path, lmdb_path, num_games=2173847, max_samples=1000, history_length=1, chunk_size=50, shuffle=True):
@@ -399,7 +453,8 @@ def store_lmdb(pgn_path, lmdb_path, num_games=2173847, max_samples=1000, history
     """
     TIMER.start("Creating LMDB")
     # Estimate map_size: very rough estimate (e.g., 1 GB per 100k samples)
-    map_size = max_samples * ((12*history_length + METADATA_PLANES)*8*8 + 4672 + 1) * 4 * 10  # float32, times 10 safety factor
+    map_size = max_samples * (HISTORY_LEN*12*64 + 5*8 + 8*8 + 1*32 + 1*16 + 1*8) * 10  # times 10 safety factor
+    print("Preallocating map size: ", map_size)
 
     env = lmdb.open(lmdb_path, map_size=map_size)
 
@@ -408,20 +463,23 @@ def store_lmdb(pgn_path, lmdb_path, num_games=2173847, max_samples=1000, history
     TIMER.start(f"Writing data")
     
     with env.begin(write=True) as txn:
-        for tensor, policy, value in encode_pgn_file(pgn_path, history_length, num_games, chunk_size):
+        for board_tensor, metadata, enpassant, halfmoves, policy, value in encode_pgn_file(pgn_path, history_length, num_games, chunk_size):  # type: ignore
             if shuffle:
-                indices = np.random.permutation(tensor.shape[0])
+                indices = np.random.permutation(board_tensor.shape[0])
 
-                tensor = tensor[indices]
+                board_tensor = board_tensor[indices]
+                metadata = metadata[indices]
+                enpassant = enpassant[indices]
+                halfmoves = halfmoves[indices]
                 policy = policy[indices]
                 value = value[indices]
 
-            for i in range(tensor.shape[0]):
+            for i in range(board_tensor.shape[0]):
                 if current_size >= max_samples:
                     break
 
                 # Serialize sample as a tuple
-                sample = (tensor[i], policy[i], value[i])
+                sample = (board_tensor[i], metadata[i], enpassant[i], halfmoves[i], policy[i], value[i])
                 key = f"{current_size:08}".encode("ascii")
                 txn.put(key, pickle.dumps(sample, protocol=pickle.HIGHEST_PROTOCOL))
 
@@ -440,6 +498,7 @@ def store_lmdb(pgn_path, lmdb_path, num_games=2173847, max_samples=1000, history
         txn.put(b"__history_length__", pickle.dumps(history_length))
 
     env.close()
+    TIMER.stop("Writing data")
     print(f"Finished writing {current_size} samples to LMDB")
 
 
@@ -447,10 +506,27 @@ def store_lmdb(pgn_path, lmdb_path, num_games=2173847, max_samples=1000, history
 if __name__ == "__main__":
     random.seed(2025)
 
+    train_samples = 20_000_000
+    val_samples = 500_000
+
     data_path = r'/teamspace/studios/this_studio/chess_bot/datasets/raw/CCRL-4040/CCRL-4040.[2173847].pgn'
     # h5py_path = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040.h5'
-    lmdb_path_train = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-train-1k-100-0.2-0.8-1.lmdb'
-    lmdb_path_val = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-val-1k-100-0.2-0.8-1.lmdb'
+    lmdb_path_train = f'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-train-{train_samples}-{val_samples}-{OPENING_SAMPLE_PROB}-{MIDGAME_SAMPLE_PROB}-{ENDGAME_SAMPLE_PROB}.lmdb'
+    lmdb_path_val = f'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-val-{train_samples}-{val_samples}-{OPENING_SAMPLE_PROB}-{MIDGAME_SAMPLE_PROB}-{ENDGAME_SAMPLE_PROB}.lmdb'
 
-    store_lmdb(pgn_path=data_path, lmdb_path=lmdb_path_train, max_samples=1_000, history_length=1, chunk_size=20, shuffle=False)
-    store_lmdb(pgn_path=data_path, lmdb_path=lmdb_path_val, max_samples=100, history_length=1, chunk_size=20, shuffle=False)
+    if os.path.exists(lmdb_path_train) or os.path.exists(lmdb_path_val):
+        raise FileExistsError(f"LMDB files already exist at {lmdb_path_train} and {lmdb_path_val}")
+
+    store_lmdb(pgn_path=data_path, lmdb_path=lmdb_path_train, max_samples=train_samples, history_length=1, chunk_size=20, shuffle=False)
+    store_lmdb(pgn_path=data_path, lmdb_path=lmdb_path_val, max_samples=val_samples, history_length=1, chunk_size=20, shuffle=False)
+
+    # TIMER.start("Loading data batch")
+    # for board_tensor, metadata, enpassant, halfmoves, policy, value in encode_pgn_file(data_path, history_length=HISTORY_LEN, num_games=1000, chunk_size=50):
+    #     TIMER.lap("Loading data batch", 1, 1)
+        # print(board_tensor.shape)
+        # print(metadata.shape)
+        # print(enpassant.shape)
+        # print(halfmoves.shape)
+        # print(policy.shape)
+        # print(value.shape)
+        # print(decode_input_tensor(board_tensor[0], metadata[0], enpassant[0], halfmoves[0]))
