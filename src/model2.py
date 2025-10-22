@@ -3,6 +3,9 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from run_timer import TIMER
+from data_preprocess import HISTORY_LEN, METADATA_PLANES
+
 # -------------------------
 # Utilities: DropPath (stochastic depth)
 # -------------------------
@@ -142,7 +145,7 @@ class RelativePosition2D(nn.Module):
     def forward(self):
         # return [num_heads, N, N]
         # indexing into table
-        bias = self.relative_bias_table[:, self.relative_index.view(-1)].view(self.num_heads, -1, -1) # type: ignore
+        bias = self.relative_bias_table[:, self.relative_index.view(-1)].view(self.num_heads, 64, 64) # type: ignore
         return bias  # [heads, N, N]
 
 # -------------------------
@@ -309,7 +312,7 @@ class ChessViTv2(nn.Module):
             # need to expand to include CLS token -> bias shape should be [heads, N+1, N+1]
             # We will pad zeros on rows/cols corresponding to cls token so attention involving CLS has no relative bias
             pad = torch.zeros(self.num_heads, 1, rel_bias.shape[-1], device=rel_bias.device, dtype=rel_bias.dtype)
-            rel_bias = torch.cat([pad, torch.cat([pad.transpose(1,2), rel_bias], dim=2)], dim=1)
+            rel_bias = torch.cat([F.pad(pad, (0, 1), value=0), torch.cat([pad.transpose(1,2), rel_bias], dim=2)], dim=1)
             # After above ops rel_bias is [heads, N+1, N+1] where first row/col = zeros for cls token
 
         # transformer blocks
@@ -388,12 +391,24 @@ class ChessViTv2(nn.Module):
 # Example usage
 # -------------------------
 if __name__ == "__main__":
+
+    TIMER.start("Initializing")
     # quick smoke test
-    B = 2
-    C = 18  # example channel count
-    x = torch.randn(B, C, 8, 8)
-    model = ChessViTv2(in_channels=C)
-    policy_flat, value, outcome, extras = model(x)
+    B = 256
+    C = 19  # example channel count
+
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    model = ChessViTv2(in_channels=C).to(device)
+    TIMER.stop("Initializing")
+
+    TIMER.start("forward pass")
+    for i in range(78125):
+        x = torch.randn(B, 19, 8, 8)
+        x = x.to(device)
+        policy_flat, value, outcome, extras = model(x)
+        TIMER.lap("forward pass", i + 1, 78125)
+    TIMER.stop("forward pass")
+
     print("policy_flat:", policy_flat.shape)       # [B, 64*73] -> 4672 if D=73
     print("value:", value.shape)
     print("outcome:", outcome.shape)

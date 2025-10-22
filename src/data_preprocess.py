@@ -262,10 +262,15 @@ def index_to_move(index, board):
         return chess.Move(from_sq, to_sq, promotion=prom_piece)
 
 
-def move_to_policy_vector(move, board):
-    index = move_to_index(move, board)
+def index_to_policy_vector(index):
     vec = np.zeros(POLICY_VECTOR_SIZE, dtype=np.float32)
     vec[index] = 1.0
+    return vec
+
+
+def move_to_policy_vector(move, board):
+    index = move_to_index(move, board)
+    vec = index_to_policy_vector(index)
     return vec
 
 
@@ -395,7 +400,6 @@ def encode_game(game, history_length=8):
             diff_mask = decoded != input_tensor
             indices = np.argwhere(diff_mask)
             indices = [tuple(idx) for idx in indices]
-            breakpoint()
             raise ValueError(f"Encoding failed at indices {indices}")
 
     return np.array(board_arrays, dtype=np.uint64), np.array(metadata_arrays, dtype=np.int8), np.array(enpassant_arrays, dtype=np.uint8), \

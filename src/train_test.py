@@ -192,10 +192,7 @@ if __name__ == "__main__":
     model = ChessViT()
 
     # Check if cuda is available
-    if torch.cuda.is_available():
-        device = 'cuda'
-    else:
-        device = 'cpu'
+    device = "cuda" if torch.cuda.is_available() else "cpu"
     print(f"Running on {device}")
 
     TIMER.stop("Initializing Model")

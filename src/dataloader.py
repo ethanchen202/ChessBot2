@@ -9,6 +9,7 @@ import os
 import random
 
 from run_timer import TIMER
+from data_preprocess import decode_input_tensor, index_to_policy_vector
 
 
 class CCRL4040H5Dataset(Dataset):
@@ -109,7 +110,10 @@ class CCRL4040LMDBDataset(Dataset):
         except Exception as e:
             raise RuntimeError(f"Corrupt LMDB entry at idx={idx}, key={f'{idx:08}'.encode('ascii')}") from e
 
-        x, policy, value = sample
+        board_tensor, metadata, enpassant, halfmoves, policy, value = sample
+        policy = index_to_policy_vector(policy)
+        x = decode_input_tensor(board_tensor, metadata, enpassant, halfmoves)
+
         return (
             torch.as_tensor(x, dtype=torch.float32),
             torch.as_tensor(policy, dtype=torch.float32),
@@ -123,7 +127,7 @@ if __name__ == "__main__":
     random.seed(2025)
 
     TIMER.start("Initializing Dataloader")
-    lmdb_path = "/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-train-1k-100-0.2-0.8-1.lmdb"
+    lmdb_path = "/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-train-20000000-500000-0.2-0.8-1.lmdb"
 
     dataset = CCRL4040LMDBDataset(lmdb_path)
 
