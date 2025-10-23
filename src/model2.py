@@ -4,7 +4,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from run_timer import TIMER
-from data_preprocess import HISTORY_LEN, METADATA_PLANES
+from data_preprocess import HISTORY_LEN, METADATA_PLANES, TOTAL_PLANES
 
 # -------------------------
 # Utilities: DropPath (stochastic depth)
@@ -171,14 +171,12 @@ class ConvStem(nn.Module):
 class ChessViTv2(nn.Module):
     def __init__(
         self,
-        in_channels,
-        img_size=8,
         embed_dim=256,
         depth=10,
         num_heads=8,
         mlp_ratio=4.0,
         num_policy_classes=4672,
-        num_dest_per_src=73,   # default alpha-zero style
+        num_dest_per_src=73,
         dropout=0.1,
         drop_path_rate=0.1,
         conv_stem_channels=64,
@@ -186,7 +184,8 @@ class ChessViTv2(nn.Module):
         layer_scale_init_value=1e-5,
     ):
         super().__init__()
-        assert img_size == 8, "This implementation assumes 8x8 chessboard"
+        in_channels = TOTAL_PLANES
+        img_size = 8
         self.img_size = img_size
         self.num_patches = img_size * img_size
         self.embed_dim = embed_dim
@@ -277,7 +276,7 @@ class ChessViTv2(nn.Module):
             if m.bias is not None:
                 nn.init.zeros_(m.bias)
 
-    def forward(self, x):
+    def forward(self, x, legal_mask=None):
         """
         x: [B, C, 8, 8]
         returns:
@@ -335,7 +334,7 @@ class ChessViTv2(nn.Module):
         policy_logits_flat = dest_logits.reshape(B, -1)  # [B, 64 * num_dest_per_src]
         # Note: some implementations multiply by src_probs etc. Here we will concatenate or combine via src distribution:
         # To compute final probability over moves, one typical approach is:
-        #   final_logits = log_softmax(src_logits) + per-source dest logits (apply broadcasting)
+        final_logits = self.combine_src_dest_logits(src_logits, dest_logits, legal_mask=legal_mask)
         # We will leave both outputs for training flexibility and also provide a convenience function to combine them.
 
         # --- Value head ---
@@ -354,7 +353,7 @@ class ChessViTv2(nn.Module):
             "policy_logits_flat_unmasked": policy_logits_flat,  # [B, 64*num_dest]
         }
 
-        return policy_logits_flat, value_scalar, outcome_logits, extras
+        return final_logits, value_scalar, outcome_logits, extras
 
     # -------------
     # Helper: combine src + dest into final flat logits (log-space) and apply legal mask
@@ -398,7 +397,11 @@ if __name__ == "__main__":
     C = 19  # example channel count
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    model = ChessViTv2(in_channels=C).to(device)
+    model = ChessViTv2().to(device)
+    pytorch_total_params = sum(p.numel() for p in model.parameters())
+    pytorch_trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    print(f"Total number of parameters: {pytorch_total_params}")
+    print(f"Number of trainable parameters: {pytorch_trainable_params}")
     TIMER.stop("Initializing")
 
     TIMER.start("forward pass")

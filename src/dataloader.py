@@ -127,19 +127,19 @@ if __name__ == "__main__":
     random.seed(2025)
 
     TIMER.start("Initializing Dataloader")
-    lmdb_path = "/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-train-20000000-500000-0.2-0.8-1.lmdb"
+    # lmdb_path = "/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-train-20000000-500000-0.2-0.8-1.lmdb"
+    lmdb_path = r"/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-train-20000000-500000-0.2-0.8-1.lmdb"
 
     dataset = CCRL4040LMDBDataset(lmdb_path)
 
     print(f"Size of dataset: {len(dataset)}")
 
     dataloader = DataLoader(
-        CCRL4040LMDBDataset(lmdb_path),
-        batch_size=320,
+        dataset=dataset,
+        batch_size=256,
         # pin_memory=True,
         shuffle=False,
         num_workers=4,
-        worker_init_fn=worker_init_fn,
         persistent_workers=True
     )
     # dataloader = DataLoader(
@@ -153,4 +153,4 @@ if __name__ == "__main__":
     for i, (x, policy, value) in enumerate(dataloader):
         TIMER.lap("Loading data batch", i + 1, len(dataloader))
         print(x.shape, policy.shape, value.shape)
-        breakpoint()
+        # breakpoint()

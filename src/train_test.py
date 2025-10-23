@@ -12,6 +12,7 @@ import pandas as pd
 from run_timer import TIMER
 from dataloader import CCRL4040LMDBDataset, worker_init_fn
 from model import ChessViT
+from model2 import ChessViTv2
 
 pd.set_option('display.max_rows', None)
 pd.set_option('display.max_columns', None)
@@ -46,7 +47,7 @@ def train_pipeline(
     
     model.to(device)
     optimizer = optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
-    # watcher = ww.WeightWatcher(model)
+    watcher = ww.WeightWatcher(model)
     
     # Losses
     policy_loss_fn = nn.CrossEntropyLoss()
@@ -66,25 +67,35 @@ def train_pipeline(
         optimizer.zero_grad()
         
         TIMER.start(f"Training for {len(train_loader)} batches")
+        TIMER.start("begin data loading")
         for step, (x, policy_labels, value_labels) in enumerate(train_loader):
+            TIMER.stop("begin data loading")
 
-            breakpoint()
+            # breakpoint()
+            TIMER.start("moving to device")
 
             x = x.to(device)
             policy_labels = policy_labels.to(device)
             value_labels = value_labels.to(device)
+
+            TIMER.stop("moving to device")
             
             with autocast(device):
-                policy_logits, value_preds = model(x)
+                TIMER.start("forward pass")
+                policy_logits, value_preds, outcome_logits, extras = model(x)
                 loss_policy = policy_loss_fn(policy_logits, policy_labels)
                 loss_value = value_loss_fn(value_preds, value_labels)
                 # Weighted sum of losses (can adjust alpha)
                 loss = loss_policy + loss_value
+                TIMER.stop("forward pass")
             
+            TIMER.start("backward pass")
             # Scale loss for gradient accumulation
             loss = loss / accumulation_steps
             scaler.scale(loss).backward()
+            TIMER.stop("backward pass")
             
+            TIMER.start("optimizer step")
             if (step + 1) % accumulation_steps == 0:
                 scaler.step(optimizer)
                 scaler.update()
@@ -93,8 +104,12 @@ def train_pipeline(
             total_policy_loss += loss_policy.item()
             total_value_loss += loss_value.item()
 
+            TIMER.stop("optimizer step")
+
             if step % 100 == 0:
                 TIMER.lap(f"Training for {len(train_loader)} batches", step + 1, len(train_loader))
+            TIMER.lap(f"Training for {len(train_loader)} batches", step + 1, len(train_loader))
+            TIMER.start("begin data loading")
         
         avg_policy_loss = total_policy_loss / len(train_loader)
         avg_value_loss = total_value_loss / len(train_loader)
@@ -124,7 +139,7 @@ def train_pipeline(
                     
                     with autocast(device):
                         # compute loss
-                        policy_logits, value_preds = model(x)
+                        policy_logits, value_preds, outcome_logits, extras = model(x)
                         val_policy_loss += policy_loss_fn(policy_logits, policy_labels).item()
                         val_value_loss += value_loss_fn(value_preds, value_labels).item()
 
@@ -157,7 +172,7 @@ def train_pipeline(
         checkpoint_path = os.path.join(checkpoint_dir, f'model_epoch_{epoch}.pt')
         torch.save(model.state_dict(), checkpoint_path)
         print(f"Checkpoint saved to {checkpoint_path}")
-        # print(watcher.analyze(plot=True))
+        print(watcher.analyze(plot=True))
 
 
 if __name__ == "__main__":
@@ -166,15 +181,15 @@ if __name__ == "__main__":
     # Paths
     # lmdb_path_train = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-train-2m-100k-0.2-0.8-1.lmdb'
     # lmdb_path_val = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-val-2m-100k-0.2-0.8-1.lmdb'
-    lmdb_path_train = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-train-1k-100-0.2-0.8-1.lmdb'
-    lmdb_path_val = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-val-1k-100-0.2-0.8-1.lmdb'
-    checkpoint_path = r'/teamspace/studios/this_studio/chess_bot/results/checkpoints/dataset-1k-100-0.2-0.8-1_lr-1e-3'
+    lmdb_path_train = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-train-1000000-1000-0.2-0.8-1.lmdb'
+    lmdb_path_val = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-val-1000000-1000-0.2-0.8-1.lmdb'
+    checkpoint_path = r'/teamspace/studios/this_studio/chess_bot/results/checkpoints/CCRL-4040-val-1000000-1000-0.2-0.8-1-lr_1e-4'
 
     # Hyperparameters
     batch_size = 32
     accumulation_steps = 1  # effective batch size = batch_size * accumulation_steps
     num_epochs = 200
-    lr = 1e-3
+    lr = 1e-4
     
     # Create datasets
     train_dataset = CCRL4040LMDBDataset(lmdb_path_train)
@@ -189,7 +204,7 @@ if __name__ == "__main__":
     
     # Initialize model
 
-    model = ChessViT()
+    model = ChessViTv2()
 
     # Check if cuda is available
     device = "cuda" if torch.cuda.is_available() else "cpu"

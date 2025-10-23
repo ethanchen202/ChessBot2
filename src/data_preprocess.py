@@ -135,6 +135,7 @@ def move_to_index(move, board):
 
     piece = board.piece_at(from_sq)
     if piece is None:
+        print(f"Invalid move detected: {move}")
         return None
 
     # Pawn promotions (excluding queen promotions, which stay in sliding category)
@@ -280,6 +281,21 @@ def policy_vector_to_move(tensor, board):
     return move
 
 
+def get_legal_mask(board):
+    mask = np.zeros((TOTAL_PLANES, 8, 8), dtype=np.float32)
+    for move in board.legal_moves:
+        index = move_to_index(move, board)
+        mask[index] = 1.0
+    return mask
+
+
+def encode_legal_mask(legal_mask):
+    return np.packbits(legal_mask.astype(np.uint8))
+
+def decode_legal_mask(legal_mask):
+    return np.unpackbits(legal_mask.astype(np.uint8))[:4672]
+
+
 def encode_input_tensor(input_tensor):
     if input_tensor.shape != (TOTAL_PLANES, 8, 8):
         raise ValueError("Input tensor must have shape (19,8,8)")
@@ -322,29 +338,19 @@ def decode_input_tensor(binary_packed, metadata_values, enpassant_values, halfmo
     return input_tensor
 
 
-# def decode_input_tensor(binary_packed, metadata_values, enpassant_values, halfmove_values):
-#     # --- reconstruct binary planes ---
-#     # binary_packed is shape (12 * HISTORY_LEN,)
-#     # Each entry represents a 64-bit board mask.
-#     bit_array = ((binary_packed[:, None] >> np.arange(64, dtype=np.uint64)) & 1).astype(np.float32)
-#     binary_planes = bit_array.reshape(-1, 8, 8)
+def verify_input_tensor_encoding(binary_packed, metadata_values, enpassant_values, halfmove_values, input_tensor):
+    test_input_tensor = decode_input_tensor(binary_packed, metadata_values, enpassant_values, halfmove_values)
+    encoded_binary_packed, encoded_metadata_values, encoded_enpassant_values, encoded_halfmove_values = encode_input_tensor(input_tensor)
+    assert np.array_equal(binary_packed, encoded_binary_packed)
+    assert np.array_equal(metadata_values, encoded_metadata_values)
+    assert np.array_equal(enpassant_values, encoded_enpassant_values)
+    assert np.array_equal(halfmove_values, encoded_halfmove_values)
+    assert np.array_equal(input_tensor, test_input_tensor)
 
-#     # --- reconstruct metadata planes ---
-#     metadata_planes = np.zeros((5, 8, 8), dtype=np.float32)
-#     for i in range(5):
-#         metadata_planes[i, 0, 0] = metadata_values[i]
 
-#     # --- reconstruct en passant plane ---
-#     enpassant_bits = np.unpackbits(enpassant_values, count=64).astype(np.float32)
-#     enpassant_plane = enpassant_bits.reshape(1, 8, 8)
-
-#     # --- reconstruct halfmove plane ---
-#     halfmove_plane = np.zeros((1, 8, 8), dtype=np.float32)
-#     halfmove_plane[0, 0, 0] = halfmove_values
-
-#     # --- concatenate all together ---
-#     reconstructed = np.concatenate([binary_planes, metadata_planes, enpassant_plane, halfmove_plane], axis=0)
-#     return reconstructed
+def verify_policy_encoding(policy_vector, move, board):
+    test_policy_vector = move_to_policy_vector(move, board)
+    assert np.array_equal(policy_vector, test_policy_vector)
 
 
 def encode_game(game, history_length=8):
@@ -362,6 +368,7 @@ def encode_game(game, history_length=8):
     num_halfmoves = [] # (num_samples,) => 1 float32 for side to move
     policy_idxs = [] # (num_samples,) => 1 uint16 for policy idx
     values = [] # (num_samples,) => 1 int8 value
+    legal_masks = [] # (num_samples, 584) => 584 uint8 bitmaps for legal move tensor
     mv_count = 0
 
     # Fill initial history with empty boards
@@ -375,6 +382,7 @@ def encode_game(game, history_length=8):
         
         input_tensor = encode_board(board, history)
         policy = move_to_index(move, board)
+        legal_mask = encode_legal_mask(board.legal_moves)
         board.push(move)
 
         if mv_count < 15:
@@ -394,6 +402,9 @@ def encode_game(game, history_length=8):
         num_halfmoves.append(halfmoves)
         policy_idxs.append(policy)
         values.append(result)
+        legal_masks.append(legal_mask)
+
+        # Verify board encoding
         if not np.array_equal(decode_input_tensor(board_planes, metadata, enpassant, halfmoves), input_tensor):
             print("Encoding failed")
             decoded = decode_input_tensor(board_planes, metadata, enpassant, halfmoves)
@@ -413,10 +424,6 @@ def encode_pgn_file(pgn_path, history_length=8, num_games=1000, chunk_size=100):
     Returns a list of games, where each game is a list of tensors.
     """
     global games_processed
-
-    # all_games_tensors = []
-    # all_policy_tensors = []
-    # all_value_tensors = []
 
     with open(pgn_path, "r") as pgn_file:
         game = chess.pgn.read_game(pgn_file)
@@ -519,7 +526,7 @@ if __name__ == "__main__":
     lmdb_path_val = f'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-val-{train_samples}-{val_samples}-{OPENING_SAMPLE_PROB}-{MIDGAME_SAMPLE_PROB}-{ENDGAME_SAMPLE_PROB}.lmdb'
 
     if os.path.exists(lmdb_path_train) or os.path.exists(lmdb_path_val):
-        raise FileExistsError(f"LMDB files already exist at {lmdb_path_train} and {lmdb_path_val}")
+        raise FileExistsError(f"LMDB files already exist at {lmdb_path_train} or {lmdb_path_val}")
 
     store_lmdb(pgn_path=data_path, lmdb_path=lmdb_path_train, max_samples=train_samples, history_length=1, chunk_size=20, shuffle=False)
     store_lmdb(pgn_path=data_path, lmdb_path=lmdb_path_val, max_samples=val_samples, history_length=1, chunk_size=20, shuffle=False)
