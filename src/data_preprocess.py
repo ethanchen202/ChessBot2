@@ -282,12 +282,11 @@ def policy_vector_to_move(tensor, board):
 
 
 def get_legal_mask(board):
-    mask = np.zeros((TOTAL_PLANES, 8, 8), dtype=np.float32)
+    mask = np.zeros((POLICY_VECTOR_SIZE,), dtype=np.float32)
     for move in board.legal_moves:
         index = move_to_index(move, board)
         mask[index] = 1.0
     return mask
-
 
 def encode_legal_mask(legal_mask):
     return np.packbits(legal_mask.astype(np.uint8))
@@ -339,6 +338,7 @@ def decode_input_tensor(binary_packed, metadata_values, enpassant_values, halfmo
 
 
 def verify_input_tensor_encoding(binary_packed, metadata_values, enpassant_values, halfmove_values, input_tensor):
+    """Verify bijective input encoding"""
     test_input_tensor = decode_input_tensor(binary_packed, metadata_values, enpassant_values, halfmove_values)
     encoded_binary_packed, encoded_metadata_values, encoded_enpassant_values, encoded_halfmove_values = encode_input_tensor(input_tensor)
     assert np.array_equal(binary_packed, encoded_binary_packed)
@@ -348,9 +348,20 @@ def verify_input_tensor_encoding(binary_packed, metadata_values, enpassant_value
     assert np.array_equal(input_tensor, test_input_tensor)
 
 
-def verify_policy_encoding(policy_vector, move, board):
-    test_policy_vector = move_to_policy_vector(move, board)
-    assert np.array_equal(policy_vector, test_policy_vector)
+def verify_policy_encoding(policy_idx, move, board):
+    """Verify bijective policy encoding"""
+    test_policy_idx = move_to_index(move, board)
+    test_move = index_to_move(policy_idx, board)
+    assert test_policy_idx == policy_idx
+    assert move.from_square == test_move.from_square and move.to_square == test_move.to_square
+
+
+def verify_legal_mask_encoding(legal_mask, encoded_legal_mask):
+    """Verify bijective legal mask encoding"""
+    decoded_legal_mask = decode_legal_mask(encoded_legal_mask)
+    test_encoded_mask = encode_legal_mask(legal_mask)
+    assert np.array_equal(legal_mask, decoded_legal_mask)
+    assert np.array_equal(encoded_legal_mask, test_encoded_mask)
 
 
 def encode_game(game, history_length=8):
@@ -382,27 +393,30 @@ def encode_game(game, history_length=8):
         
         input_tensor = encode_board(board, history)
         policy = move_to_index(move, board)
-        legal_mask = encode_legal_mask(board.legal_moves)
-        board.push(move)
+        legal_mask = get_legal_mask(board)
 
         if mv_count < 15:
             if random.random() > OPENING_SAMPLE_PROB:
+                board.push(move)
                 continue
         elif mv_count < 40:
             if random.random() > MIDGAME_SAMPLE_PROB:
+                board.push(move)
                 continue
         else:
             if random.random() > ENDGAME_SAMPLE_PROB:
+                board.push(move)
                 continue
 
         board_planes, metadata, enpassant, halfmoves = encode_input_tensor(input_tensor)
+        encoded_legal_mask = encode_legal_mask(legal_mask)
         board_arrays.append(board_planes)
         metadata_arrays.append(metadata)
         enpassant_arrays.append(enpassant)
         num_halfmoves.append(halfmoves)
         policy_idxs.append(policy)
         values.append(result)
-        legal_masks.append(legal_mask)
+        legal_masks.append(encoded_legal_mask)
 
         # Verify board encoding
         if not np.array_equal(decode_input_tensor(board_planes, metadata, enpassant, halfmoves), input_tensor):
@@ -412,9 +426,18 @@ def encode_game(game, history_length=8):
             indices = np.argwhere(diff_mask)
             indices = [tuple(idx) for idx in indices]
             raise ValueError(f"Encoding failed at indices {indices}")
+        
+        # Verify safe data preprocessing
+        verify_input_tensor_encoding(board_planes, metadata, enpassant, halfmoves, input_tensor)
+        verify_policy_encoding(policy, move, board)
+        verify_legal_mask_encoding(legal_mask, encoded_legal_mask)
+
+        # Update board
+        board.push(move)
 
     return np.array(board_arrays, dtype=np.uint64), np.array(metadata_arrays, dtype=np.int8), np.array(enpassant_arrays, dtype=np.uint8), \
-        np.array(num_halfmoves, dtype=np.float32),  np.array(policy_idxs, dtype=np.uint16), np.array(values, dtype=np.int8)
+        np.array(num_halfmoves, dtype=np.float32),  np.array(policy_idxs, dtype=np.uint16), np.array(values, dtype=np.int8), \
+            np.array(legal_masks, dtype=np.uint8) 
 
 
 def encode_pgn_file(pgn_path, history_length=8, num_games=1000, chunk_size=100):
@@ -439,22 +462,25 @@ def encode_pgn_file(pgn_path, history_length=8, num_games=1000, chunk_size=100):
             all_halfmoves_tensors = []
             all_policy_tensors = []
             all_value_tensors = []
+            all_legal_masks = []
             
             for _ in range(chunk_size):
                 if game is None:
                     break
-                board_tensors, metadata_tensors, enpassant_tensors, halfmove_tensors, policy_tensors, value_tensors = encode_game(game, history_length=history_length)
+                board_tensors, metadata_tensors, enpassant_tensors, halfmove_tensors, policy_tensors, value_tensors, legal_masks = encode_game(game, history_length=history_length)
                 all_board_tensors.append(board_tensors)
                 all_metadata_tensors.append(metadata_tensors)
                 all_enpassant_tensors.append(enpassant_tensors)
                 all_halfmoves_tensors.append(halfmove_tensors)
                 all_policy_tensors.append(policy_tensors)
                 all_value_tensors.append(value_tensors)
+                all_legal_masks.append(legal_masks)
                 game = chess.pgn.read_game(pgn_file)
 
             games_processed += 1
             yield np.concatenate(all_board_tensors, axis=0), np.concatenate(all_metadata_tensors, axis=0), np.concatenate(all_enpassant_tensors, axis=0), \
-                np.concatenate(all_halfmoves_tensors, axis=0), np.concatenate(all_policy_tensors, axis=0), np.concatenate(all_value_tensors, axis=0)
+                np.concatenate(all_halfmoves_tensors, axis=0), np.concatenate(all_policy_tensors, axis=0), np.concatenate(all_value_tensors, axis=0), \
+                    np.concatenate(all_legal_masks, axis=0)
 
 
 def store_lmdb(pgn_path, lmdb_path, num_games=2173847, max_samples=1000, history_length=1, chunk_size=50, shuffle=True):
@@ -464,7 +490,7 @@ def store_lmdb(pgn_path, lmdb_path, num_games=2173847, max_samples=1000, history
     """
     TIMER.start("Creating LMDB")
     # Estimate map_size: very rough estimate (e.g., 1 GB per 100k samples)
-    map_size = max_samples * (HISTORY_LEN*12*64 + 5*8 + 8*8 + 1*32 + 1*16 + 1*8) * 10  # times 10 safety factor
+    map_size = max_samples * (HISTORY_LEN*12*8 + 5*1 + 8*1 + 1*4 + 1*2 + 1*1 + 4672) * 10  # times 10 safety factor
     print("Preallocating map size: ", map_size)
 
     env = lmdb.open(lmdb_path, map_size=map_size)
@@ -474,7 +500,7 @@ def store_lmdb(pgn_path, lmdb_path, num_games=2173847, max_samples=1000, history
     TIMER.start(f"Writing data")
     
     with env.begin(write=True) as txn:
-        for board_tensor, metadata, enpassant, halfmoves, policy, value in encode_pgn_file(pgn_path, history_length, num_games, chunk_size):  # type: ignore
+        for board_tensor, metadata, enpassant, halfmoves, policy, value, legal_mask in encode_pgn_file(pgn_path, history_length, num_games, chunk_size):  # type: ignore
             if shuffle:
                 indices = np.random.permutation(board_tensor.shape[0])
 
@@ -484,22 +510,23 @@ def store_lmdb(pgn_path, lmdb_path, num_games=2173847, max_samples=1000, history
                 halfmoves = halfmoves[indices]
                 policy = policy[indices]
                 value = value[indices]
+                legal_mask = legal_mask[indices]
 
             for i in range(board_tensor.shape[0]):
                 if current_size >= max_samples:
                     break
 
                 # Serialize sample as a tuple
-                sample = (board_tensor[i], metadata[i], enpassant[i], halfmoves[i], policy[i], value[i])
+                sample = (board_tensor[i], metadata[i], enpassant[i], halfmoves[i], policy[i], value[i], legal_mask[i])
                 key = f"{current_size:08}".encode("ascii")
                 txn.put(key, pickle.dumps(sample, protocol=pickle.HIGHEST_PROTOCOL))
 
                 current_size += 1
 
-            if current_size / max_samples > progress:
+            while current_size / max_samples > progress:
                 TIMER.lap("Writing data", current_size, max_samples)
                 print(f"Currently: {current_size}/{max_samples}")
-                progress += 0.01
+                progress += 0.002
 
             if current_size >= max_samples:
                 break
@@ -532,12 +559,6 @@ if __name__ == "__main__":
     store_lmdb(pgn_path=data_path, lmdb_path=lmdb_path_val, max_samples=val_samples, history_length=1, chunk_size=20, shuffle=False)
 
     # TIMER.start("Loading data batch")
-    # for board_tensor, metadata, enpassant, halfmoves, policy, value in encode_pgn_file(data_path, history_length=HISTORY_LEN, num_games=1000, chunk_size=50):
+    # for board_tensor, metadata, enpassant, halfmoves, policy, value, legal_mask in encode_pgn_file(data_path, history_length=HISTORY_LEN, num_games=1000, chunk_size=50):
     #     TIMER.lap("Loading data batch", 1, 1)
-        # print(board_tensor.shape)
-        # print(metadata.shape)
-        # print(enpassant.shape)
-        # print(halfmoves.shape)
-        # print(policy.shape)
-        # print(value.shape)
-        # print(decode_input_tensor(board_tensor[0], metadata[0], enpassant[0], halfmoves[0]))
+    #     print(board_tensor.shape, metadata.shape, enpassant.shape, halfmoves.shape, policy.shape, value.shape, legal_mask.shape)
