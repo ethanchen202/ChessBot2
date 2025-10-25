@@ -73,37 +73,24 @@ def train_pipeline(
         
         optimizer.zero_grad()
         
-        TIMER.start(f"Training for {len(train_loader)} batches")
-        TIMER.start("begin data loading")
         for step, (x, policy_labels, value_labels, legal_mask) in enumerate(train_loader):
-            TIMER.stop("begin data loading")
-
-            # breakpoint()
-            TIMER.start("moving to device")
 
             x = x.to(device)
             policy_labels = policy_labels.to(device)
             value_labels = value_labels.to(device)
             legal_mask = legal_mask.to(device)
-
-            TIMER.stop("moving to device")
             
             with autocast(device):
-                TIMER.start("forward pass")
                 policy_logits, value_preds, outcome_logits, extras = model(x, legal_mask)
                 loss_policy = policy_loss_fn(policy_logits, policy_labels)
                 loss_value = value_loss_fn(value_preds, value_labels)
                 # Weighted sum of losses (can adjust alpha)
                 loss = loss_policy + loss_value
-                TIMER.stop("forward pass")
             
-            TIMER.start("backward pass")
             # Scale loss for gradient accumulation
             loss = loss / accumulation_steps
             scaler.scale(loss).backward()
-            TIMER.stop("backward pass")
             
-            TIMER.start("optimizer step")
             if (step + 1) % accumulation_steps == 0:
                 scaler.step(optimizer)
                 scaler.update()
@@ -112,12 +99,9 @@ def train_pipeline(
             total_policy_loss += loss_policy.item()
             total_value_loss += loss_value.item()
 
-            TIMER.stop("optimizer step")
-
             if step % 100 == 0:
                 TIMER.lap(f"Training for {len(train_loader)} batches", step + 1, len(train_loader))
             TIMER.lap(f"Training for {len(train_loader)} batches", step + 1, len(train_loader))
-            TIMER.start("begin data loading")
         
         avg_policy_loss = total_policy_loss / len(train_loader)
         avg_value_loss = total_value_loss / len(train_loader)
