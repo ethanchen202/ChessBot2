@@ -9,7 +9,7 @@ import os
 import random
 
 from run_timer import TIMER
-from data_preprocess import decode_input_tensor, index_to_policy_vector
+from data_preprocess import decode_input_tensor, index_to_policy_vector, decode_legal_mask
 
 
 class CCRL4040H5Dataset(Dataset):
@@ -110,7 +110,8 @@ class CCRL4040LMDBDataset(Dataset):
         except Exception as e:
             raise RuntimeError(f"Corrupt LMDB entry at idx={idx}, key={f'{idx:08}'.encode('ascii')}") from e
 
-        board_tensor, metadata, enpassant, halfmoves, policy, value = sample
+        board_tensor, metadata, enpassant, halfmoves, policy, value, legal_mask = sample
+        legal_mask = decode_legal_mask(legal_mask)
         policy = index_to_policy_vector(policy)
         x = decode_input_tensor(board_tensor, metadata, enpassant, halfmoves)
 
@@ -118,6 +119,7 @@ class CCRL4040LMDBDataset(Dataset):
             torch.as_tensor(x, dtype=torch.float32),
             torch.as_tensor(policy, dtype=torch.float32),
             torch.as_tensor(value, dtype=torch.float32),
+            torch.as_tensor(legal_mask, dtype=torch.bool)
         )
 
 
@@ -150,7 +152,7 @@ if __name__ == "__main__":
     TIMER.stop("Initializing Dataloader")
 
     TIMER.start("Loading data batch")
-    for i, (x, policy, value) in enumerate(dataloader):
+    for i, (x, policy, value, legal_mask) in enumerate(dataloader):
         TIMER.lap("Loading data batch", i + 1, len(dataloader))
-        print(x.shape, policy.shape, value.shape)
+        print(x.shape, policy.shape, value.shape, legal_mask.shape)
         # breakpoint()

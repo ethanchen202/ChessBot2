@@ -4,6 +4,7 @@ import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
 from torch.amp.grad_scaler import GradScaler
 from torch.amp.autocast_mode import autocast
+from torch.optim.lr_scheduler import CosineAnnealingWarmRestarts, LinearLR, SequentialLR
 import os
 import shutil
 import weightwatcher as ww
@@ -48,6 +49,12 @@ def train_pipeline(
     model.to(device)
     optimizer = optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
     watcher = ww.WeightWatcher(model)
+
+    # LR Scheduler
+    optimizer = optim.AdamW(model.parameters(), lr=lr, weight_decay=0.05)
+    warmup_scheduler = LinearLR(optimizer, start_factor=0.1, total_iters=5)
+    cosine_scheduler = CosineAnnealingWarmRestarts(optimizer, T_0=5, T_mult=2, eta_min=1e-6)
+    scheduler = SequentialLR(optimizer, schedulers=[warmup_scheduler, cosine_scheduler], milestones=[5])
     
     # Losses
     policy_loss_fn = nn.CrossEntropyLoss()
@@ -68,7 +75,7 @@ def train_pipeline(
         
         TIMER.start(f"Training for {len(train_loader)} batches")
         TIMER.start("begin data loading")
-        for step, (x, policy_labels, value_labels) in enumerate(train_loader):
+        for step, (x, policy_labels, value_labels, legal_mask) in enumerate(train_loader):
             TIMER.stop("begin data loading")
 
             # breakpoint()
@@ -77,12 +84,13 @@ def train_pipeline(
             x = x.to(device)
             policy_labels = policy_labels.to(device)
             value_labels = value_labels.to(device)
+            legal_mask = legal_mask.to(device)
 
             TIMER.stop("moving to device")
             
             with autocast(device):
                 TIMER.start("forward pass")
-                policy_logits, value_preds, outcome_logits, extras = model(x)
+                policy_logits, value_preds, outcome_logits, extras = model(x, legal_mask)
                 loss_policy = policy_loss_fn(policy_logits, policy_labels)
                 loss_value = value_loss_fn(value_preds, value_labels)
                 # Weighted sum of losses (can adjust alpha)
@@ -113,6 +121,7 @@ def train_pipeline(
         
         avg_policy_loss = total_policy_loss / len(train_loader)
         avg_value_loss = total_value_loss / len(train_loader)
+        scheduler.step()
         print(f"Epoch {epoch}: Avg Policy Loss={avg_policy_loss:.4f}, Avg Value Loss={avg_value_loss:.4f}")
         
         TIMER.stop(f"Training epoch {epoch}")
@@ -181,12 +190,12 @@ if __name__ == "__main__":
     # Paths
     # lmdb_path_train = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-train-2m-100k-0.2-0.8-1.lmdb'
     # lmdb_path_val = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-val-2m-100k-0.2-0.8-1.lmdb'
-    lmdb_path_train = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-train-1000000-1000-0.2-0.8-1.lmdb'
-    lmdb_path_val = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-val-1000000-1000-0.2-0.8-1.lmdb'
+    lmdb_path_train = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-train-20000000-500000-0.2-0.8-1.lmdb'
+    lmdb_path_val = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-val-20000000-500000-0.2-0.8-1.lmdb'
     checkpoint_path = r'/teamspace/studios/this_studio/chess_bot/results/checkpoints/CCRL-4040-val-1000000-1000-0.2-0.8-1-lr_1e-4'
 
     # Hyperparameters
-    batch_size = 32
+    batch_size = 512
     accumulation_steps = 1  # effective batch size = batch_size * accumulation_steps
     num_epochs = 200
     lr = 1e-4

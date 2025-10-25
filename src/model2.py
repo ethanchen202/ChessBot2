@@ -406,9 +406,9 @@ if __name__ == "__main__":
 
     TIMER.start("forward pass")
     for i in range(78125):
-        x = torch.randn(B, 19, 8, 8)
-        x = x.to(device)
-        policy_flat, value, outcome, extras = model(x)
+        x = torch.randn(B, 19, 8, 8).to(device)
+        legal_mask = torch.ones(B, 4672, dtype=torch.bool).to(device)
+        policy_flat, value, outcome, extras = model(x, legal_mask=legal_mask)
         TIMER.lap("forward pass", i + 1, 78125)
     TIMER.stop("forward pass")
 
