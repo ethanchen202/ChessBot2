@@ -2,3 +2,4 @@ datasets/*
 results/checkpoints/*
 ww-img
 results/last_run_logs.txt
+results/logs/*
