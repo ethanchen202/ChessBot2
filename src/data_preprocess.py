@@ -544,8 +544,8 @@ def store_lmdb(pgn_path, lmdb_path, num_games=2173847, max_samples=1000, history
 if __name__ == "__main__":
     random.seed(2025)
 
-    train_samples = 20_000_000
-    val_samples = 500_000
+    train_samples = 10_000
+    val_samples = 1_000
 
     data_path = r'/teamspace/studios/this_studio/chess_bot/datasets/raw/CCRL-4040/CCRL-4040.[2173847].pgn'
     # h5py_path = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040.h5'

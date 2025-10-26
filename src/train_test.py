@@ -73,6 +73,7 @@ def train_pipeline(
         
         optimizer.zero_grad()
         
+        TIMER.start(f"Training for {len(train_loader)} batches")
         for step, (x, policy_labels, value_labels, legal_mask) in enumerate(train_loader):
 
             x = x.to(device)
@@ -81,16 +82,21 @@ def train_pipeline(
             legal_mask = legal_mask.to(device)
             
             with autocast(device):
+                # TIMER.start("Forward pass")
                 policy_logits, value_preds, outcome_logits, extras = model(x, legal_mask)
                 loss_policy = policy_loss_fn(policy_logits, policy_labels)
                 loss_value = value_loss_fn(value_preds, value_labels)
                 # Weighted sum of losses (can adjust alpha)
                 loss = loss_policy + loss_value
+                # TIMER.stop("Forward pass")
             
+            # TIMER.start("Graadient computation")
             # Scale loss for gradient accumulation
             loss = loss / accumulation_steps
             scaler.scale(loss).backward()
+            # TIMER.stop("Graadient computation")
             
+            # TIMER.start("Optimizer step")
             if (step + 1) % accumulation_steps == 0:
                 scaler.step(optimizer)
                 scaler.update()
@@ -98,10 +104,11 @@ def train_pipeline(
             
             total_policy_loss += loss_policy.item()
             total_value_loss += loss_value.item()
+            # TIMER.stop("Optimizer step")
 
-            if step % 100 == 0:
+            if (step + 1) % 100 == 0:
                 TIMER.lap(f"Training for {len(train_loader)} batches", step + 1, len(train_loader))
-            TIMER.lap(f"Training for {len(train_loader)} batches", step + 1, len(train_loader))
+            # TIMER.lap(f"Training for {len(train_loader)} batches", step + 1, len(train_loader))
         
         avg_policy_loss = total_policy_loss / len(train_loader)
         avg_value_loss = total_value_loss / len(train_loader)
@@ -125,14 +132,15 @@ def train_pipeline(
             total = 0
 
             with torch.no_grad():
-                for x, policy_labels, value_labels in val_loader:
+                for x, policy_labels, value_labels, legal_mask in val_loader:
                     x = x.to(device)
                     policy_labels = policy_labels.to(device)
                     value_labels = value_labels.to(device)
+                    legal_mask = legal_mask.to(device)
                     
                     with autocast(device):
                         # compute loss
-                        policy_logits, value_preds, outcome_logits, extras = model(x)
+                        policy_logits, value_preds, outcome_logits, extras = model(x, legal_mask)
                         val_policy_loss += policy_loss_fn(policy_logits, policy_labels).item()
                         val_value_loss += value_loss_fn(value_preds, value_labels).item()
 
@@ -165,21 +173,34 @@ def train_pipeline(
         checkpoint_path = os.path.join(checkpoint_dir, f'model_epoch_{epoch}.pt')
         torch.save(model.state_dict(), checkpoint_path)
         print(f"Checkpoint saved to {checkpoint_path}")
+        TIMER.start("Generating ww analysis")
         print(watcher.analyze(plot=True))
+        TIMER.stop("Generating ww analysis")
 
 
 if __name__ == "__main__":
 
     TIMER.start("Initializing Dataloader")
+
+    # Data hyperparams    
+    OPENING_SAMPLE_PROB = 0.2
+    MIDGAME_SAMPLE_PROB = 0.8
+    ENDGAME_SAMPLE_PROB = 1
+    train_samples = 10_000
+    val_samples = 1_000
+
     # Paths
-    # lmdb_path_train = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-train-2m-100k-0.2-0.8-1.lmdb'
-    # lmdb_path_val = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-val-2m-100k-0.2-0.8-1.lmdb'
-    lmdb_path_train = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-train-20000000-500000-0.2-0.8-1.lmdb'
-    lmdb_path_val = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-val-20000000-500000-0.2-0.8-1.lmdb'
-    checkpoint_path = r'/teamspace/studios/this_studio/chess_bot/results/checkpoints/CCRL-4040-val-1000000-1000-0.2-0.8-1-lr_1e-4'
+    lmdb_path_train = f'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-train-{train_samples}-{val_samples}-{OPENING_SAMPLE_PROB}-{MIDGAME_SAMPLE_PROB}-{ENDGAME_SAMPLE_PROB}.lmdb'
+    lmdb_path_val = f'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-val-{train_samples}-{val_samples}-{OPENING_SAMPLE_PROB}-{MIDGAME_SAMPLE_PROB}-{ENDGAME_SAMPLE_PROB}.lmdb'
+    # lmdb_path_train = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-train-20000000-500000-0.2-0.8-1.lmdb'
+    # lmdb_path_val = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-val-20000000-500000-0.2-0.8-1.lmdb'
+    checkpoint_path = r'/teamspace/studios/this_studio/chess_bot/results/checkpoints/_test_run'
+
+    if not os.path.exists(lmdb_path_train) or not os.path.exists(lmdb_path_val):
+        raise Exception(f"LMDB files not found at {lmdb_path_train} or {lmdb_path_val}")
 
     # Hyperparameters
-    batch_size = 512
+    batch_size = 256
     accumulation_steps = 1  # effective batch size = batch_size * accumulation_steps
     num_epochs = 200
     lr = 1e-4
