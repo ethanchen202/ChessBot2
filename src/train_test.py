@@ -15,9 +15,10 @@ from dataloader import CCRL4040LMDBDataset, worker_init_fn
 from model import ChessViT
 from model2 import ChessViTv2
 
+# view entire weightwatcher df
 pd.set_option('display.max_rows', None)
 pd.set_option('display.max_columns', None)
-pd.set_option('display.width', 1000) # Adjust width for better column display
+pd.set_option('display.width', 1000)
 
 
 # ----------------------------
@@ -41,6 +42,7 @@ def train_pipeline(
     if load_from_checkpoint_path is not None:
         checkpoint = torch.load(load_from_checkpoint_path, map_location=device)
         model.load_state_dict(checkpoint)
+        print(f"Loaded checkpoint from {load_from_checkpoint_path}")
 
     if os.path.exists(checkpoint_dir):
         shutil.rmtree(checkpoint_dir)
@@ -194,7 +196,8 @@ if __name__ == "__main__":
     lmdb_path_val = f'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-val-{train_samples}-{val_samples}-{OPENING_SAMPLE_PROB}-{MIDGAME_SAMPLE_PROB}-{ENDGAME_SAMPLE_PROB}.lmdb'
     # lmdb_path_train = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-train-20000000-500000-0.2-0.8-1.lmdb'
     # lmdb_path_val = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-val-20000000-500000-0.2-0.8-1.lmdb'
-    checkpoint_path = r'/teamspace/studios/this_studio/chess_bot/results/checkpoints/_test_run'
+    checkpoint_path = f'/teamspace/studios/this_studio/chess_bot/results/checkpoints/run2-{train_samples}-{val_samples}-{OPENING_SAMPLE_PROB}-{MIDGAME_SAMPLE_PROB}-{ENDGAME_SAMPLE_PROB}'
+    load_from_checkpoint_path = r'/teamspace/studios/this_studio/chess_bot/results/checkpoints/run-10000-1000-0.2-0.8-1/model_epoch_61.pt'
 
     if not os.path.exists(lmdb_path_train) or not os.path.exists(lmdb_path_val):
         raise Exception(f"LMDB files not found at {lmdb_path_train} or {lmdb_path_val}")
@@ -235,5 +238,6 @@ if __name__ == "__main__":
         lr=lr, 
         accumulation_steps=accumulation_steps,
         device=device,
+        load_from_checkpoint_path=load_from_checkpoint_path,
         checkpoint_dir=checkpoint_path,
     )

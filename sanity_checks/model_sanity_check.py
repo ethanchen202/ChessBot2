@@ -1,16 +1,19 @@
 import sys
 
-from torch.cuda import is_available
-
 sys.path.append("/teamspace/studios/this_studio/chess_bot/src")
 
-from data_sanity_check import print_board, index_to_piece
+from data_sanity_check import print_board, index_to_piece # type: ignore
 from model import ChessViT # type: ignore
+from model2 import ChessViTv2 # type: ignore
 from run_timer import TIMER # type: ignore
-from data_preprocess import policy_vector_to_move, board_to_planes, index_to_move # type: ignore
+from data_preprocess import index_to_move, HISTORY_LEN, encode_board, get_legal_mask # type: ignore
+
+from torch.cuda import is_available
+import weightwatcher as ww
 import torch
 import numpy as np
 import chess
+from collections import deque
 
 
 def board_from_ascii(ascii_board):
@@ -67,7 +70,8 @@ def board_from_ascii(ascii_board):
 
 if __name__ == "__main__":
     with torch.no_grad():
-        checkpoint_dir = r"/teamspace/studios/this_studio/chess_bot/results/checkpoints/dataset-2m_lr-1e-4/model_epoch_78.pt"
+        TIMER.start("Initializing")
+        load_from_checkpoint_path = r"/teamspace/studios/this_studio/chess_bot/results/checkpoints/run2-10000-1000-0.2-0.8-1/model_epoch_200.pt"
 
         # if torch.cuda.is_available():
         #     device = "cuda"
@@ -75,8 +79,9 @@ if __name__ == "__main__":
         #     device = "cpu"
         device = "cpu"
 
-        model = ChessViT()
-        model.load_state_dict(torch.load(checkpoint_dir, map_location=torch.device('cpu')))
+        model = ChessViTv2()
+        model.load_state_dict(torch.load(load_from_checkpoint_path, map_location=torch.device('cpu')))
+        TIMER.stop("Initializing")
 
         # board =  """r..qkr..
         #             ppp..pp.
@@ -95,39 +100,26 @@ if __name__ == "__main__":
 
         op_move = input("Enter opponent move (press enter for White): ")
 
+        history = deque(maxlen=HISTORY_LEN)
+        empty_planes = np.zeros((12, 8, 8), dtype=np.float32)
+        for _ in range(HISTORY_LEN):
+            history.append(empty_planes)
+
         if op_move:
+            input_tensor = encode_board(board, history)
             board.push(chess.Move.from_uci(op_move))
 
-        while not board.is_game_over():        
+        while not board.is_game_over():
+
+            # breakpoint()
 
             TIMER.start("forward pass")
 
-            # Stack history
-            current_planes = board_to_planes(board)
+            input_tensor = encode_board(board, history)
+            input_tensor = torch.as_tensor(input_tensor).unsqueeze(0)
+            legal_mask = torch.as_tensor(get_legal_mask(board), dtype=torch.bool)
 
-            # Side-to-move plane (1/-1 for white/black)
-            side_plane = np.full((1, 8, 8), (1 if board.turn == chess.WHITE else -1), dtype=np.float32)
-
-            # Castling Rights
-            castle_plane_kw = np.full((1, 8, 8), (1 if board.has_kingside_castling_rights(chess.WHITE) else 0), dtype=np.float32)
-            castle_plane_qw = np.full((1, 8, 8), (1 if board.has_queenside_castling_rights(chess.WHITE) else 0), dtype=np.float32)
-            castle_plane_kb = np.full((1, 8, 8), (1 if board.has_kingside_castling_rights(chess.BLACK) else 0), dtype=np.float32)
-            castle_plane_qb = np.full((1, 8, 8), (1 if board.has_queenside_castling_rights(chess.BLACK) else 0), dtype=np.float32)
-
-            # En Passant
-            ep_plane = np.zeros((1, 8, 8), dtype=np.float32)
-            if board.ep_square is not None:
-                x = chess.square_file(board.ep_square)
-                y = 7 - chess.square_rank(board.ep_square)
-                ep_plane[0, y, x] = 1
-
-            input_tensor = np.concatenate([current_planes, side_plane, castle_plane_kw, 
-                                    castle_plane_qw, castle_plane_kb, castle_plane_qb, ep_plane], axis=0)
-            input_tensor = torch.tensor(input_tensor).unsqueeze(0)
-
-            print(input_tensor.shape)
-
-            policy_logits, value = model(input_tensor)
+            policy_logits, value, _, _ = model(input_tensor, legal_mask)
             
             # Get probabilities (optional, but makes sorting clear)
             probs = torch.softmax(policy_logits[0], dim=-1)
