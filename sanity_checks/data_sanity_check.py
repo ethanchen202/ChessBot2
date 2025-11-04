@@ -2,13 +2,16 @@ import sys
 
 sys.path.append("/teamspace/studios/this_studio/chess_bot/src")
 
-from data_preprocess import move_to_index, index_to_move, encode_board      # type: ignore
-from dataloader import CCRL4040LMDBDataset, worker_init_fn                  # type: ignore
-from run_timer import TIMER                                                 # type: ignore
+# from chess_bot.src.dataloader import decode_input_tensor
+from data_preprocess2 import move_to_index, index_to_move, encode_board, planes_to_board, decode_input_tensor # type: ignore[import]
+from dataloader import CCRL4040LMDBDataset, worker_init_fn                  # type: ignore[import]
+from run_timer import TIMER                                                 # type: ignore[import]
 from torch.utils.data import DataLoader
 import numpy as np
 import chess
 import chess.pgn
+import lmdb
+import pickle
 
 
 piece_to_index = {
@@ -51,22 +54,7 @@ def print_board(tensor):
     print(board_str)
 
 
-def decode_board_tensor(tensor):
-    board_str = ""
-    for rank in range(8):  # ranks 0..7
-        row_str = ""
-        for file in range(8):  # files 0..7
-            piece_symbol = "."
-            for plane in range(12):
-                if tensor[plane, rank, file] == 1:
-                    piece_symbol = index_to_piece[plane]
-                    break
-            row_str += piece_symbol + " "
-        board_str += row_str + "\n"
-    print(board_str)
-
-
-def sanity_check_input(h5_path, lmdb_path):
+def sanity_check_input(lmdb_path):
     dataset = CCRL4040LMDBDataset(lmdb_path)
 
     TIMER.start("Initializing Dataloader")
@@ -126,13 +114,28 @@ def sanity_check_policy(pgn_path, num_games=100):
             TIMER.lap("Reading game", game_idx + 1, num_games)
         TIMER.stop("Reading game")
         print(correct, total, correct / total)
-            
+
+def sanity_check_soft_keys(keys_path, soft_path):
+    keys = np.fromfile(keys_path, dtype=np.uint8).reshape(-1, 20) # 20 because SHA1 is 20 bytes
+    print(keys.shape)
+    with lmdb.open(soft_path, readonly=True, lock=False) as env:
+        with env.begin() as txn:
+            data = txn.get(keys[0])
+            sample = pickle.loads(data)
+            action_distr, value_distr, other = sample
+            board_tensor, metadata, enpassant, halfmoves, legal_mask = other
+            input_tensor = decode_input_tensor(board_tensor, metadata, enpassant, halfmoves)
+            breakpoint()
+            print(input_tensor.shape)
+            print("Success")
 
 
 
 if __name__ == "__main__":
-    h5_path = r"/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040.h5"
     lmdb_path = r"/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-train-1m-50k-legacy.lmdb"
+    soft_path = r"/teamspace/studios/this_studio/chess_bot/datasets/soft/CCRL-4040-100.lmdb"
+    keys_path = r"/teamspace/studios/this_studio/chess_bot/datasets/soft/CCRL-4040-100-keys.bin"
     pgn_path = r"/teamspace/studios/this_studio/chess_bot/datasets/raw/CCRL-4040/CCRL-4040.[2173847].pgn"
     # sanity_check_input(h5_path, lmdb_path)
-    sanity_check_policy(pgn_path, num_games=1000)
+    # sanity_check_policy(pgn_path, num_games=1000)
+    sanity_check_soft_keys(keys_path, soft_path)

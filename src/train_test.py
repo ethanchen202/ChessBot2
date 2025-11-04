@@ -11,7 +11,7 @@ import weightwatcher as ww
 import pandas as pd
 
 from run_timer import TIMER
-from dataloader import CCRL4040LMDBDataset, worker_init_fn
+from dataloader import SoftCCRL4040LMDBDataset
 from model import ChessViT
 from model2 import ChessViTv2
 
@@ -84,21 +84,21 @@ def train_pipeline(
             legal_mask = legal_mask.to(device)
             
             with autocast(device):
-                # TIMER.start("Forward pass")
+                TIMER.start("Forward pass")
                 policy_logits, value_preds, outcome_logits, extras = model(x, legal_mask)
                 loss_policy = policy_loss_fn(policy_logits, policy_labels)
                 loss_value = value_loss_fn(value_preds, value_labels)
                 # Weighted sum of losses (can adjust alpha)
                 loss = loss_policy + loss_value
-                # TIMER.stop("Forward pass")
+                TIMER.stop("Forward pass")
             
-            # TIMER.start("Graadient computation")
+            TIMER.start("Graadient computation")
             # Scale loss for gradient accumulation
             loss = loss / accumulation_steps
             scaler.scale(loss).backward()
-            # TIMER.stop("Graadient computation")
+            TIMER.stop("Graadient computation")
             
-            # TIMER.start("Optimizer step")
+            TIMER.start("Optimizer step")
             if (step + 1) % accumulation_steps == 0:
                 scaler.step(optimizer)
                 scaler.update()
@@ -106,11 +106,11 @@ def train_pipeline(
             
             total_policy_loss += loss_policy.item()
             total_value_loss += loss_value.item()
-            # TIMER.stop("Optimizer step")
+            TIMER.stop("Optimizer step")
 
             if (step + 1) % 100 == 0:
                 TIMER.lap(f"Training for {len(train_loader)} batches", step + 1, len(train_loader))
-            # TIMER.lap(f"Training for {len(train_loader)} batches", step + 1, len(train_loader))
+            TIMER.lap(f"Training for {len(train_loader)} batches", step + 1, len(train_loader))
         
         avg_policy_loss = total_policy_loss / len(train_loader)
         avg_value_loss = total_value_loss / len(train_loader)
@@ -188,19 +188,21 @@ if __name__ == "__main__":
     OPENING_SAMPLE_PROB = 0.2
     MIDGAME_SAMPLE_PROB = 0.8
     ENDGAME_SAMPLE_PROB = 1
-    train_samples = 10_000
-    val_samples = 1_000
+    train_samples = 1_000_000
+    val_samples = 100_000
 
     # Paths
-    lmdb_path_train = f'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-train-{train_samples}-{val_samples}-{OPENING_SAMPLE_PROB}-{MIDGAME_SAMPLE_PROB}-{ENDGAME_SAMPLE_PROB}.lmdb'
-    lmdb_path_val = f'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-val-{train_samples}-{val_samples}-{OPENING_SAMPLE_PROB}-{MIDGAME_SAMPLE_PROB}-{ENDGAME_SAMPLE_PROB}.lmdb'
-    # lmdb_path_train = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-train-20000000-500000-0.2-0.8-1.lmdb'
-    # lmdb_path_val = r'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-val-20000000-500000-0.2-0.8-1.lmdb'
-    checkpoint_path = f'/teamspace/studios/this_studio/chess_bot/results/checkpoints/run2-{train_samples}-{val_samples}-{OPENING_SAMPLE_PROB}-{MIDGAME_SAMPLE_PROB}-{ENDGAME_SAMPLE_PROB}'
+    lmdb_path_train = f"/teamspace/studios/this_studio/chess_bot/datasets/processed/soft-CCRL-4040-train-{train_samples}-{val_samples}.lmdb"
+    lmdb_path_val = f"/teamspace/studios/this_studio/chess_bot/datasets/processed/soft-CCRL-4040-val-{train_samples}-{val_samples}.lmdb"
+    # lmdb_path_train = f'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-train-{train_samples}-{val_samples}-{OPENING_SAMPLE_PROB}-{MIDGAME_SAMPLE_PROB}-{ENDGAME_SAMPLE_PROB}.lmdb'
+    # lmdb_path_val = f'/teamspace/studios/this_studio/chess_bot/datasets/processed/CCRL-4040-val-{train_samples}-{val_samples}-{OPENING_SAMPLE_PROB}-{MIDGAME_SAMPLE_PROB}-{ENDGAME_SAMPLE_PROB}.lmdb'
+    checkpoint_path = f'/teamspace/studios/this_studio/chess_bot/results/checkpoints/soft-CCRL-4040-train-{train_samples}-{val_samples}'
     load_from_checkpoint_path = r'/teamspace/studios/this_studio/chess_bot/results/checkpoints/run-10000-1000-0.2-0.8-1/model_epoch_61.pt'
 
     if not os.path.exists(lmdb_path_train) or not os.path.exists(lmdb_path_val):
-        raise Exception(f"LMDB files not found at {lmdb_path_train} or {lmdb_path_val}")
+        raise FileNotFoundError(f"LMDB files not found at {lmdb_path_train} or {lmdb_path_val}")
+    if os.path.exists(checkpoint_path):
+        raise FileExistsError(f"Checkpoint directory {checkpoint_path} already exists")
 
     # Hyperparameters
     batch_size = 256
@@ -209,11 +211,11 @@ if __name__ == "__main__":
     lr = 1e-4
     
     # Create datasets
-    train_dataset = CCRL4040LMDBDataset(lmdb_path_train)
-    val_dataset = CCRL4040LMDBDataset(lmdb_path_val)
+    train_dataset = SoftCCRL4040LMDBDataset(lmdb_path_train)
+    val_dataset = SoftCCRL4040LMDBDataset(lmdb_path_val)
     
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=False, num_workers=4, worker_init_fn=worker_init_fn, persistent_workers=True, pin_memory=True)
-    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=4, worker_init_fn=worker_init_fn, persistent_workers=True, pin_memory=True)
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=False, num_workers=4, persistent_workers=True, pin_memory=True)
+    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=4, persistent_workers=True, pin_memory=True)
     
     TIMER.stop("Initializing Dataloader")
 
